@@ -2,8 +2,10 @@
 import { Shader, initWebgl } from './engine/webgl'
 import { data3dCube, data3dCubeColor } from './data/cube'
 import { Camera } from './engine/camera'
+import { keys, setupInputHandlers } from './engine/keys'
 import { Matrix4 } from './math/matrix'
 import { Vec3 } from './math/vector'
+import { Quaternion } from './math/quaternion'
 
 
 let gl: WebGL2RenderingContext
@@ -74,6 +76,8 @@ export async function init() {
     gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
 
+    setupInputHandlers()
+
     render(vao!, shader)
 
 }
@@ -101,11 +105,14 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
         width / height,
         1, 2000,
     )
+    camera.position.set(0, 300, 1800)
     const cameraTarget = Vec3.zero()
 
 
     const start = document.timeline.currentTime as number
     let t
+
+    const q = Quaternion.identity()
 
     function loop(dt: number) {
         t = dt - start
@@ -118,7 +125,18 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
         // gl.bindVertexArray(vao)
 
 
-        camera.position.set(0, 300, 1800)
+        // if (keys.zoomIn) {
+        //     if (Math.abs(camera.position.z - cameraTarget.z) > 200) {
+        //         camera.position.setZ(camera.position.z - 20)
+        //     }
+        // }
+        // if (keys.zoomOut) {
+        //     if (Math.abs(camera.position.z - cameraTarget.z) < 1900) {
+        //         camera.position.setZ(camera.position.z + 20)
+        //     }
+        // }
+
+
         camera.lookAt(cameraTarget)
 
         gl.uniformMatrix4fv(
@@ -131,8 +149,32 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
 
         const objectMatrix = Matrix4.identity()
             .scale(50, 50, 50)
-            .rotateY(t * 0.1 * 1 * Math.PI / 180)
-            .rotateX(t * 0.1 * 1 * Math.PI / 180)
+            // .rotateY(t * 0.1 * 1 * Math.PI / 180)
+            // .rotateX(t * 0.1 * 1 * Math.PI / 180)
+
+
+
+
+        if (keys.left) {
+            q.multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), 0.01))
+            q.multiply(Quaternion.axisAngle(new Vec3(1, 0, 0), 0.01))
+            q.multiply(Quaternion.axisAngle(new Vec3(1, 0, 1), 0.01))
+        }
+
+        if (keys.right) {
+            q.multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), -0.01))
+            q.multiply(Quaternion.axisAngle(new Vec3(1, 0, 0), -0.01))
+            q.multiply(Quaternion.axisAngle(new Vec3(1, 0, 1), -0.01))
+        }
+
+        objectMatrix.multiply(q.matrix())
+
+
+
+
+
+
+
 
         gl.uniformMatrix4fv(
             shader.locations['u_matrix'],

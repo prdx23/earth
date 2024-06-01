@@ -18,9 +18,27 @@ export class Vec3 {
         this.z = z
     }
 
+    setX(x: number): void {
+        this.x = x
+    }
+
+    setY(y: number): void {
+        this.y = y
+    }
+
+    setZ(z: number): void {
+        this.z = z
+    }
+
     // clone(): Vec3 {
     //     return new Vec3(this.x, this.y, this.z)
     // }
+
+    static copy(a: Vec3, b: Vec3): void {
+        a.x = b.x
+        a.y = b.y
+        a.z = b.z
+    }
 
     static zero(): Vec3 {
         return new Vec3(0, 0, 0)
@@ -29,21 +47,21 @@ export class Vec3 {
 
     // --------------------------
 
-    // static add(a: Vec3, b: Vec3): Vec3 {
-    //     return new Vec3(a.x + b.x, a.y + b.y, a.z + b.z)
-    // }
+    static add(a: Vec3, b: Vec3): Vec3 {
+        return new Vec3(a.x + b.x, a.y + b.y, a.z + b.z)
+    }
 
-    // static subtract(a: Vec3, b: Vec3): Vec3 {
-    //     return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z)
-    // }
+    static subtract(a: Vec3, b: Vec3): Vec3 {
+        return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z)
+    }
 
-    // static multiply(a: Vec3, b: Vec3): Vec3 {
-    //     return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z)
-    // }
+    static multiply(a: Vec3, b: Vec3): Vec3 {
+        return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z)
+    }
 
-    // static divide(a: Vec3, b: Vec3): Vec3 {
-    //     return new Vec3(a.x / b.x, a.y / b.y, a.z / b.z)
-    // }
+    static divide(a: Vec3, b: Vec3): Vec3 {
+        return new Vec3(a.x / b.x, a.y / b.y, a.z / b.z)
+    }
 
     // --------------------------
 
@@ -93,13 +111,10 @@ export class Vec3 {
 
     normalize(): Vec3 {
         if (this.isZero()) { return this }
-
-        const len = this.length()
-        if (len < 0.00001) { return Vec3.zero() }
-
-        this.x /= len
-        this.y /= len
-        this.z /= len
+        const invlen = 1 / this.length()
+        this.x *= invlen
+        this.y *= invlen
+        this.z *= invlen
         return this
     }
 
