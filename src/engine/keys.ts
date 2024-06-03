@@ -3,7 +3,7 @@
 
 
 export const keys: Record<string, boolean> = {
-    // any: false,
+    any: false,
     up: false, down: false, left: false, right: false,
     zoomOut: false, zoomIn: false,
 }
@@ -40,7 +40,9 @@ export function setupInputHandlers() {
     window.addEventListener('keyup', (event) => {
         if (keysWhitelist.includes(event.code)) {
             keys[keyMapping[event.code]] = false
+
             keys.any = false
+            keys.any = Object.values(keys).some(x => x)
         }
     })
 }

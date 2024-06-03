@@ -1,7 +1,7 @@
 
 import { Shader, initWebgl } from './engine/webgl'
 import { data3dCube, data3dCubeColor } from './data/cube'
-import { Camera } from './engine/camera'
+import { Camera, OrbitCamera } from './engine/camera'
 import { keys, setupInputHandlers } from './engine/keys'
 import { Matrix4 } from './math/matrix'
 import { Vec3 } from './math/vector'
@@ -105,14 +105,18 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
         width / height,
         1, 3000,
     )
-    camera.position.set(0, 400, 1800)
-    const cameraTarget = Vec3.zero()
+    // camera.position.set(0, 400, 1800)
+    // camera.lookAt(Vec3.origin)
+
+    const orbitCam = new OrbitCamera()
+    orbitCam.distance = 800
+    orbitCam.angle = { x: -30, y: -30 }
+    orbitCam.updateCamera(camera)
 
 
     const start = document.timeline.currentTime as number
     let t
 
-    const q = Quaternion.identity()
 
     function loop(dt: number) {
         t = dt - start
@@ -137,7 +141,32 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
         // }
 
 
-        camera.lookAt(cameraTarget)
+        if (keys.any) {
+
+            if (keys.left) {
+                orbitCam.angle.x -= 1
+            }
+
+            if (keys.right) {
+                orbitCam.angle.x += 1
+            }
+
+            if (keys.up && orbitCam.angle.y > -90) {
+                orbitCam.angle.y -= 1
+            }
+
+            if (keys.down && orbitCam.angle.y < 90) {
+                orbitCam.angle.y += 1
+            }
+
+            orbitCam.updateCamera(camera)
+        }
+
+        // camera.matrix
+        //     .identity()
+        //     .translate(camera.position.x, camera.position.y, camera.position.z)
+        //     .lookAt(camera.position, cameraTarget, Vec3.up)
+
 
         gl.uniformMatrix4fv(
             shader.locations['u_view_projection_matrix'],
@@ -147,33 +176,9 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
 
 
 
-        let objectMatrix = Matrix4.identity()
-            .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.03 * 1 * Math.PI / 180).matrix())
+        const objectMatrix = Matrix4.identity()
+            // .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.03 * 1 * Math.PI / 180).matrix())
             .scale(50, 50, 50)
-            // .rotateY(t * 0.1 * 1 * Math.PI / 180)
-            // .rotateX(t * 0.1 * 1 * Math.PI / 180)
-
-
-
-
-        if (keys.left) {
-            q.multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), 0.01))
-            q.multiply(Quaternion.axisAngle(new Vec3(1, 0, 0), 0.01))
-            q.multiply(Quaternion.axisAngle(new Vec3(1, 0, 1), 0.01))
-        }
-
-        if (keys.right) {
-            q.multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), -0.01))
-            q.multiply(Quaternion.axisAngle(new Vec3(1, 0, 0), -0.01))
-            q.multiply(Quaternion.axisAngle(new Vec3(1, 0, 1), -0.01))
-        }
-
-        objectMatrix.multiply(q.matrix())
-
-
-
-
-
 
 
 
@@ -190,52 +195,6 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
             0,             // offset
             6 * 6             // count
         )
-
-        objectMatrix = Matrix4.identity()
-            .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.05 * 1 * Math.PI / 180).matrix())
-            .translate(300, 0, 0)
-            .multiply(Quaternion.axisAngle(new Vec3(1, 0, 0), 27 * Math.PI / 180).matrix())
-            .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.05 * 1 * Math.PI / 180).matrix())
-            .scale(25, 25, 25)
-
-
-        gl.uniformMatrix4fv(
-            shader.locations['u_matrix'],
-            false,
-            new Float32Array(objectMatrix.matrix)
-        )
-
-        gl.drawArrays(
-            gl.TRIANGLES,  // primitive type
-            0,             // offset
-            6 * 6             // count
-        )
-
-
-        objectMatrix = Matrix4.identity()
-            .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.05 * 1 * Math.PI / 180).matrix())
-            .translate(300, 0, 0)
-            .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.07 * 1 * Math.PI / 180).matrix())
-            .translate(-100, 0, 0)
-            .translate(0, Math.sin(t * 0.001) * 40, 0)
-            // .multiply(Quaternion.axisAngle(new Vec3(1, 0, 0), 27 * Math.PI / 180).matrix())
-            .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.1 * 1 * Math.PI / 180).matrix())
-            // .multiply(Quaternion.axisAngle(new Vec3(1, 0, 0), t * 0.1 * 1 * Math.PI / 180).matrix())
-            .scale(10, 10, 10)
-
-
-        gl.uniformMatrix4fv(
-            shader.locations['u_matrix'],
-            false,
-            new Float32Array(objectMatrix.matrix)
-        )
-
-        gl.drawArrays(
-            gl.TRIANGLES,  // primitive type
-            0,             // offset
-            6 * 6             // count
-        )
-
 
         requestAnimationFrame(loop)
     }

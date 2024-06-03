@@ -1,5 +1,6 @@
 
 import { Matrix4 } from "../math/matrix";
+import { Quaternion } from "../math/quaternion";
 import { Vec3 } from "../math/vector";
 
 
@@ -7,33 +8,78 @@ import { Vec3 } from "../math/vector";
 export class Camera {
 
     position: Vec3
-    up: Vec3
-    __positionCopy: Vec3
-    __matrix: Matrix4
-    __projectionMatrix: Matrix4
-    __viewProjectionMatrix: Matrix4
 
-    constructor(fovInRadians: number, aspect: number, near: number, far: number) {
+    _matrix: Matrix4
+    _lookAtMatrix: Matrix4
+    _projectionMatrix: Matrix4
+    _viewProjectionMatrix: Matrix4
+
+
+    constructor(fov: number, aspect: number, near: number, far: number) {
         this.position = Vec3.zero()
-        this.__positionCopy = Vec3.zero()
-        this.up = new Vec3(0, 1, 0)
-        this.__matrix = Matrix4.identity()
-        this.__projectionMatrix = Matrix4.perspective(
-            fovInRadians, aspect, near, far
-        )
-        this.__viewProjectionMatrix = Matrix4.identity()
+        this._matrix = Matrix4.identity()
+        this._lookAtMatrix = Matrix4.identity()
+        this._projectionMatrix = Matrix4.perspective(fov, aspect, near, far)
+        this._viewProjectionMatrix = Matrix4.identity()
     }
 
 
     lookAt(target: Vec3): void {
-        Vec3.copy(this.__positionCopy, this.position)
-        this.__matrix = Matrix4.lookAt(this.__positionCopy, target, this.up)
+        this._lookAtMatrix
+            .identity()
+            .lookAt(this.position, target, Vec3.up)
     }
 
 
     viewProjectionMatrix(): Matrix4 {
-        Matrix4.copy(this.__viewProjectionMatrix, this.__projectionMatrix)
-        return this.__viewProjectionMatrix.multiply(this.__matrix.inverse())
+        this._matrix
+            .identity()
+            .translate(this.position.x, this.position.y, this.position.z)
+            .multiply(this._lookAtMatrix)
+
+        return this._viewProjectionMatrix
+            .copy(this._projectionMatrix)
+            .multiply(this._matrix.inverse())
+    }
+
+}
+
+
+export class OrbitCamera {
+
+    distance: number
+    angle: { x: number, y: number }
+
+    _qh: Quaternion
+    _qv: Quaternion
+    _matrix: Matrix4
+
+
+    constructor() {
+        this.distance = 0
+        this.angle = { x: 0, y: 0 }
+        this._qh = Quaternion.identity()
+        this._qv = Quaternion.identity()
+        this._matrix = Matrix4.identity()
+    }
+
+
+    updateCamera(camera: Camera): void {
+        this._qh.setAxisAngle(Vec3.up, this.angle.x * Math.PI / 180)
+        this._qv.setAxisAngle(Vec3.right, this.angle.y * Math.PI / 180)
+
+        this._matrix
+            .identity()
+            .multiply(this._qh.matrix())
+            .multiply(this._qv.matrix())
+            .translate(0, 0, this.distance)
+
+        camera.position.set(
+            this._matrix.matrix[12],
+            this._matrix.matrix[13],
+            this._matrix.matrix[14],
+        )
+        camera.lookAt(Vec3.origin)
     }
 
 }

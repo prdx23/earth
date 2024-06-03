@@ -6,6 +6,9 @@
 import { Vec3 } from "./vector"
 
 
+const scratchVec = Vec3.zero()
+
+
 export class Matrix4 {
 
 
@@ -26,23 +29,68 @@ export class Matrix4 {
     //     ])
     // }
 
-    static copy(a: Matrix4, b: Matrix4): void {
-        a.matrix[0]  = b.matrix[0]
-        a.matrix[1]  = b.matrix[1]
-        a.matrix[2]  = b.matrix[2]
-        a.matrix[3]  = b.matrix[3]
-        a.matrix[4]  = b.matrix[4]
-        a.matrix[5]  = b.matrix[5]
-        a.matrix[6]  = b.matrix[6]
-        a.matrix[7]  = b.matrix[7]
-        a.matrix[8]  = b.matrix[8]
-        a.matrix[9]  = b.matrix[9]
-        a.matrix[10] = b.matrix[10]
-        a.matrix[11] = b.matrix[11]
-        a.matrix[12] = b.matrix[12]
-        a.matrix[13] = b.matrix[13]
-        a.matrix[14] = b.matrix[14]
-        a.matrix[15] = b.matrix[15]
+    // static copy(a: Matrix4, b: Matrix4): void {
+    //     a.matrix[0]  = b.matrix[0]
+    //     a.matrix[1]  = b.matrix[1]
+    //     a.matrix[2]  = b.matrix[2]
+    //     a.matrix[3]  = b.matrix[3]
+    //     a.matrix[4]  = b.matrix[4]
+    //     a.matrix[5]  = b.matrix[5]
+    //     a.matrix[6]  = b.matrix[6]
+    //     a.matrix[7]  = b.matrix[7]
+    //     a.matrix[8]  = b.matrix[8]
+    //     a.matrix[9]  = b.matrix[9]
+    //     a.matrix[10] = b.matrix[10]
+    //     a.matrix[11] = b.matrix[11]
+    //     a.matrix[12] = b.matrix[12]
+    //     a.matrix[13] = b.matrix[13]
+    //     a.matrix[14] = b.matrix[14]
+    //     a.matrix[15] = b.matrix[15]
+    // }
+
+    copy(other: Matrix4): Matrix4 {
+        this.matrix[0]  = other.matrix[0]
+        this.matrix[1]  = other.matrix[1]
+        this.matrix[2]  = other.matrix[2]
+        this.matrix[3]  = other.matrix[3]
+        this.matrix[4]  = other.matrix[4]
+        this.matrix[5]  = other.matrix[5]
+        this.matrix[6]  = other.matrix[6]
+        this.matrix[7]  = other.matrix[7]
+        this.matrix[8]  = other.matrix[8]
+        this.matrix[9]  = other.matrix[9]
+        this.matrix[10] = other.matrix[10]
+        this.matrix[11] = other.matrix[11]
+        this.matrix[12] = other.matrix[12]
+        this.matrix[13] = other.matrix[13]
+        this.matrix[14] = other.matrix[14]
+        this.matrix[15] = other.matrix[15]
+        return this
+    }
+
+    set(
+        a: number, b: number, c: number, d: number,
+        e: number, f: number, g: number, h: number,
+        i: number, j: number, k: number, l: number,
+        m: number, n: number, o: number, p: number,
+    ): Matrix4 {
+        this.matrix[0]  = a
+        this.matrix[1]  = b
+        this.matrix[2]  = c
+        this.matrix[3]  = d
+        this.matrix[4]  = e
+        this.matrix[5]  = f
+        this.matrix[6]  = g
+        this.matrix[7]  = h
+        this.matrix[8]  = i
+        this.matrix[9]  = j
+        this.matrix[10] = k
+        this.matrix[11] = l
+        this.matrix[12] = m
+        this.matrix[13] = n
+        this.matrix[14] = o
+        this.matrix[15] = p
+        return this
     }
 
 
@@ -55,15 +103,35 @@ export class Matrix4 {
         ])
     }
 
-
-    static translation(tx: number, ty: number, tz: number): Matrix4 {
-        return new Matrix4([
-            1,  0,  0,  0,
-            0,  1,  0,  0,
-            0,  0,  1,  0,
-            tx, ty, tz, 1,
-        ])
+    identity(): Matrix4 {
+        this.matrix[0]  = 1
+        this.matrix[1]  = 0
+        this.matrix[2]  = 0
+        this.matrix[3]  = 0
+        this.matrix[4]  = 0
+        this.matrix[5]  = 1
+        this.matrix[6]  = 0
+        this.matrix[7]  = 0
+        this.matrix[8]  = 0
+        this.matrix[9]  = 0
+        this.matrix[10] = 1
+        this.matrix[11] = 0
+        this.matrix[12] = 0
+        this.matrix[13] = 0
+        this.matrix[14] = 0
+        this.matrix[15] = 1
+        return this
     }
+
+
+    // static translation(tx: number, ty: number, tz: number): Matrix4 {
+    //     return new Matrix4([
+    //         1,  0,  0,  0,
+    //         0,  1,  0,  0,
+    //         0,  0,  1,  0,
+    //         tx, ty, tz, 1,
+    //     ])
+    // }
 
 
     translate(tx: number, ty: number, tz: number): Matrix4 {
@@ -76,16 +144,16 @@ export class Matrix4 {
     }
 
 
-    static xRotation(angleInRadians: number): Matrix4 {
-        const c = Math.cos(angleInRadians)
-        const s = Math.sin(angleInRadians)
-        return new Matrix4([
-            1, 0, 0, 0,
-            0, c, s, 0,
-            0, -s, c, 0,
-            0, 0, 0, 1,
-        ])
-    }
+    // static xRotation(angleInRadians: number): Matrix4 {
+    //     const c = Math.cos(angleInRadians)
+    //     const s = Math.sin(angleInRadians)
+    //     return new Matrix4([
+    //         1, 0, 0, 0,
+    //         0, c, s, 0,
+    //         0, -s, c, 0,
+    //         0, 0, 0, 1,
+    //     ])
+    // }
 
 
     rotateX(angleInRadians: number): Matrix4 {
@@ -100,16 +168,16 @@ export class Matrix4 {
     }
 
 
-    static yRotation(angleInRadians: number): Matrix4 {
-        const c = Math.cos(angleInRadians)
-        const s = Math.sin(angleInRadians)
-        return new Matrix4([
-            c, 0, -s, 0,
-            0, 1, 0, 0,
-            s, 0, c, 0,
-            0, 0, 0, 1,
-        ])
-    }
+    // static yRotation(angleInRadians: number): Matrix4 {
+    //     const c = Math.cos(angleInRadians)
+    //     const s = Math.sin(angleInRadians)
+    //     return new Matrix4([
+    //         c, 0, -s, 0,
+    //         0, 1, 0, 0,
+    //         s, 0, c, 0,
+    //         0, 0, 0, 1,
+    //     ])
+    // }
 
 
     rotateY(angleInRadians: number): Matrix4 {
@@ -124,16 +192,16 @@ export class Matrix4 {
     }
 
 
-    static zRotation(angleInRadians: number): Matrix4 {
-        const c = Math.cos(angleInRadians)
-        const s = Math.sin(angleInRadians)
-        return new Matrix4([
-            c, s, 0, 0,
-            -s, c, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1,
-        ])
-    }
+    // static zRotation(angleInRadians: number): Matrix4 {
+    //     const c = Math.cos(angleInRadians)
+    //     const s = Math.sin(angleInRadians)
+    //     return new Matrix4([
+    //         c, s, 0, 0,
+    //         -s, c, 0, 0,
+    //         0, 0, 1, 0,
+    //         0, 0, 0, 1,
+    //     ])
+    // }
 
 
     rotateZ(angleInRadians: number): Matrix4 {
@@ -148,14 +216,14 @@ export class Matrix4 {
     }
 
 
-    static scaling(sx: number, sy: number, sz: number): Matrix4 {
-        return new Matrix4([
-            sx, 0,  0,  0,
-            0, sy,  0,  0,
-            0,  0, sz,  0,
-            0,  0,  0,  1,
-        ])
-    }
+    // static scaling(sx: number, sy: number, sz: number): Matrix4 {
+    //     return new Matrix4([
+    //         sx, 0,  0,  0,
+    //         0, sy,  0,  0,
+    //         0,  0, sz,  0,
+    //         0,  0,  0,  1,
+    //     ])
+    // }
 
 
     scale(sx: number, sy: number, sz: number): Matrix4 {
@@ -211,21 +279,19 @@ export class Matrix4 {
         ])
     }
 
-    static lookAt(cameraPosition: Vec3, target: Vec3, up: Vec3): Matrix4 {
-        const cx = cameraPosition.x
-        const cy = cameraPosition.y
-        const cz = cameraPosition.z
-
-        const zAxis = cameraPosition.subtract(target).normalize()
+    lookAt(cameraPosition: Vec3, target: Vec3, up: Vec3): Matrix4 {
+        const zAxis = scratchVec.copy(cameraPosition).subtract(target).normalize()
         const xAxis = up.cross(zAxis).normalize()
         const yAxis = zAxis.cross(xAxis).normalize()
 
-        return new Matrix4([
+        this.__multiplyInternal(
             xAxis.x, xAxis.y, xAxis.z, 0,
             yAxis.x, yAxis.y, yAxis.z, 0,
             zAxis.x, zAxis.y, zAxis.z, 0,
-            cx, cy, cz, 1,
-        ])
+            0, 0, 0, 1,
+        )
+
+        return this
     }
 
 

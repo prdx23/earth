@@ -18,26 +18,33 @@ export class Vec3 {
         this.z = z
     }
 
-    setX(x: number): void {
-        this.x = x
-    }
+    // setX(x: number): void {
+    //     this.x = x
+    // }
 
-    setY(y: number): void {
-        this.y = y
-    }
+    // setY(y: number): void {
+    //     this.y = y
+    // }
 
-    setZ(z: number): void {
-        this.z = z
-    }
+    // setZ(z: number): void {
+    //     this.z = z
+    // }
 
     // clone(): Vec3 {
     //     return new Vec3(this.x, this.y, this.z)
     // }
 
-    static copy(a: Vec3, b: Vec3): void {
-        a.x = b.x
-        a.y = b.y
-        a.z = b.z
+    // static copy(a: Vec3, b: Vec3): void {
+    //     a.x = b.x
+    //     a.y = b.y
+    //     a.z = b.z
+    // }
+
+    copy(other: Vec3): Vec3 {
+        this.x = other.x
+        this.y = other.y
+        this.z = other.z
+        return this
     }
 
     static zero(): Vec3 {
@@ -45,23 +52,29 @@ export class Vec3 {
     }
 
 
+    static readonly origin = new Vec3(0, 0, 0)
+    static readonly up = new Vec3(0, 1, 0)
+    static readonly right = new Vec3(1, 0, 0)
+    static readonly front = new Vec3(0, 0, 1)
+
+
     // --------------------------
 
-    static add(a: Vec3, b: Vec3): Vec3 {
-        return new Vec3(a.x + b.x, a.y + b.y, a.z + b.z)
-    }
+    // static add(a: Vec3, b: Vec3): Vec3 {
+    //     return new Vec3(a.x + b.x, a.y + b.y, a.z + b.z)
+    // }
 
-    static subtract(a: Vec3, b: Vec3): Vec3 {
-        return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z)
-    }
+    // static subtract(a: Vec3, b: Vec3): Vec3 {
+    //     return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z)
+    // }
 
-    static multiply(a: Vec3, b: Vec3): Vec3 {
-        return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z)
-    }
+    // static multiply(a: Vec3, b: Vec3): Vec3 {
+    //     return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z)
+    // }
 
-    static divide(a: Vec3, b: Vec3): Vec3 {
-        return new Vec3(a.x / b.x, a.y / b.y, a.z / b.z)
-    }
+    // static divide(a: Vec3, b: Vec3): Vec3 {
+    //     return new Vec3(a.x / b.x, a.y / b.y, a.z / b.z)
+    // }
 
     // --------------------------
 

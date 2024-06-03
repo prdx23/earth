@@ -14,6 +14,7 @@ export class Quaternion {
     x: number
     y: number
     z: number
+    _matrix: Matrix4
 
 
     constructor(w: number, x: number, y: number, z: number) {
@@ -21,11 +22,19 @@ export class Quaternion {
         this.x = x
         this.y = y
         this.z = z
+        this._matrix = Matrix4.identity()
     }
 
 
     static identity(): Quaternion {
         return new Quaternion(1, 0, 0, 0)
+    }
+
+    identity() {
+        this.w = 1
+        this.x = 0
+        this.y = 0
+        this.z = 0
     }
 
 
@@ -106,12 +115,13 @@ export class Quaternion {
         // | xy + wz         1 - xx - zz     yz - wx      |
         // | xz - wy         yz + wx         1 - xx - yy  |
 
-        return new Matrix4([
+        this._matrix.set(
             1 - yy - zz,   xy + wz,       xz - wy,      0,
             xy - wz,       1 - xx - zz,   yz + wx,      0,
             xz + wy,       yz - wx,       1 - xx - yy,  0,
             0,             0,             0,            1,
-        ])
+        )
+        return this._matrix
     }
 
 
