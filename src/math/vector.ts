@@ -154,4 +154,11 @@ export class Vec3 {
         return this.x == 0 && this.y == 0 && this.z == 0
     }
 
+
+    static midpoint(a: Vec3, b: Vec3): Vec3 {
+        return Vec3.zero().copy(a).add(
+            Vec3.zero().copy(b).subtract(a).scale(0.5)
+        )
+    }
+
 }

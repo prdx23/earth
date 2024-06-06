@@ -7,12 +7,16 @@ import { Matrix4 } from './math/matrix'
 import { Vec3 } from './math/vector'
 import { Quaternion } from './math/quaternion'
 
-import { icosahedron } from './shapes/icosahedron'
+// import { icosahedron } from './shapes/icosahedron'
+import { generateIcosahedron } from './mesh'
 
 
 let gl: WebGL2RenderingContext
 const width = 800
 const height = 800
+
+
+const icosahedron = generateIcosahedron(3)
 
 
 export async function init() {
@@ -199,7 +203,7 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
             // gl.LINE_LOOP,  // primitive type
             0,             // offset
             // 6 * 6             // count
-            icosahedron.vertices.length,
+            icosahedron.triangles.length * 3,
         )
 
         requestAnimationFrame(loop)
