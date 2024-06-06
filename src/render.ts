@@ -7,14 +7,16 @@ import { Matrix4 } from './math/matrix'
 import { Vec3 } from './math/vector'
 import { Quaternion } from './math/quaternion'
 
+import { icosahedron } from './shapes/icosahedron'
+
 
 let gl: WebGL2RenderingContext
 const width = 800
 const height = 800
 
 
-
 export async function init() {
+
 
     const glctx = initWebgl(width, height)
 
@@ -33,13 +35,15 @@ export async function init() {
     ])
 
 
+
     const vao = gl.createVertexArray()
     gl.bindVertexArray(vao)
 
 
     const bufferPos = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferPos)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data3dCube), gl.STATIC_DRAW)
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data3dCube), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, icosahedron.points, gl.STATIC_DRAW)
 
 
     const positionAttributeLocation = gl.getAttribLocation(shader.program, 'a_position')
@@ -59,7 +63,8 @@ export async function init() {
 
     const bufferCol = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferCol)
-    gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(data3dCubeColor), gl.STATIC_DRAW)
+    // gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(data3dCubeColor), gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, icosahedron.colors, gl.STATIC_DRAW)
 
 
     const colorAttributeLocation = gl.getAttribLocation(shader.program, 'a_color')
@@ -118,8 +123,13 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
     let t
 
 
+    const objectMatrix = Matrix4.identity()
+        // .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.03 * 1 * Math.PI / 180).matrix())
+        .scale(100, 100, 100)
+
+
     function loop(dt: number) {
-        t = dt - start
+        // t = dt - start
 
         gl.clearColor(0, 0, 0, 1)
         gl.clear(gl.COLOR_BUFFER_BIT)
@@ -151,11 +161,11 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
                 orbitCam.angle.x += 1
             }
 
-            if (keys.up && orbitCam.angle.y > -90) {
+            if (keys.up && orbitCam.angle.y > -89) {
                 orbitCam.angle.y -= 1
             }
 
-            if (keys.down && orbitCam.angle.y < 90) {
+            if (keys.down && orbitCam.angle.y < 89) {
                 orbitCam.angle.y += 1
             }
 
@@ -176,24 +186,20 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
 
 
 
-        const objectMatrix = Matrix4.identity()
-            // .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.03 * 1 * Math.PI / 180).matrix())
-            .scale(50, 50, 50)
-
-
-
         gl.uniformMatrix4fv(
             shader.locations['u_matrix'],
             false,
-            new Float32Array(objectMatrix.matrix)
+            objectMatrix.matrix
         )
 
 
 
         gl.drawArrays(
             gl.TRIANGLES,  // primitive type
+            // gl.LINE_LOOP,  // primitive type
             0,             // offset
-            6 * 6             // count
+            // 6 * 6             // count
+            icosahedron.vertices.length,
         )
 
         requestAnimationFrame(loop)
