@@ -6,13 +6,15 @@ type Gl = WebGL2RenderingContext
 
 export class Shader {
 
-    filename: string
+    vertFile: string
+    fragFile: string
     program!: WebGLProgram
     locations: Record<string, WebGLUniformLocation>
 
 
-    constructor(filename: string) {
-        this.filename = filename
+    constructor(vertFile: string, fragFile: string) {
+        this.vertFile = vertFile
+        this.fragFile = fragFile
         this.locations = {}
     }
 
@@ -35,13 +37,13 @@ export class Shader {
         const vertexShader = createShader(
             gl,
             gl.VERTEX_SHADER,
-            (await import(`../shaders/${this.filename}.vert?raw`)).default
+            (await import(`../shaders/${this.vertFile}.vert?raw`)).default
         )
 
         const fragmentShader = createShader(
             gl,
             gl.FRAGMENT_SHADER,
-            (await import(`../shaders/${this.filename}.frag?raw`)).default,
+            (await import(`../shaders/${this.fragFile}.frag?raw`)).default,
         )
 
         const program = gl.createProgram()!

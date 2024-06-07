@@ -1,14 +1,13 @@
 
 import { Shader, initWebgl } from './engine/webgl'
-import { data3dCube, data3dCubeColor } from './data/cube'
 import { Camera, OrbitCamera } from './engine/camera'
 import { keys, setupInputHandlers } from './engine/keys'
 import { Matrix4 } from './math/matrix'
-import { Vec3 } from './math/vector'
-import { Quaternion } from './math/quaternion'
 
-// import { icosahedron } from './shapes/icosahedron'
-import { generateIcosahedron } from './mesh'
+// import { data3dCube, data3dCubeColor } from './mesh/cube'
+// import { generateIcosahedron } from './mesh/icosahedron'
+import { generateSphere } from './mesh/sphere'
+
 
 
 let gl: WebGL2RenderingContext
@@ -16,7 +15,7 @@ const width = 800
 const height = 800
 
 
-const icosahedron = generateIcosahedron(3)
+const sphere = generateSphere(3)
 
 
 export async function init() {
@@ -32,7 +31,7 @@ export async function init() {
     gl = glctx
     document.body.appendChild(gl.canvas as HTMLCanvasElement)
 
-    const shader = new Shader('main')
+    const shader = new Shader('main', 'main')
     await shader.load(gl, [
         // 'u_view_matrix', 'u_projection_matrix', 'u_matrix',
         'u_view_projection_matrix', 'u_matrix',
@@ -47,7 +46,7 @@ export async function init() {
     const bufferPos = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferPos)
     // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data3dCube), gl.STATIC_DRAW)
-    gl.bufferData(gl.ARRAY_BUFFER, icosahedron.points, gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, sphere.points, gl.STATIC_DRAW)
 
 
     const positionAttributeLocation = gl.getAttribLocation(shader.program, 'a_position')
@@ -68,7 +67,7 @@ export async function init() {
     const bufferCol = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferCol)
     // gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(data3dCubeColor), gl.STATIC_DRAW)
-    gl.bufferData(gl.ARRAY_BUFFER, icosahedron.colors, gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, sphere.colors, gl.STATIC_DRAW)
 
 
     const colorAttributeLocation = gl.getAttribLocation(shader.program, 'a_color')
@@ -143,19 +142,15 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
         // gl.bindVertexArray(vao)
 
 
-        // if (keys.zoomIn) {
-        //     if (Math.abs(camera.position.z - cameraTarget.z) > 200) {
-        //         camera.position.setZ(camera.position.z - 20)
-        //     }
-        // }
-        // if (keys.zoomOut) {
-        //     if (Math.abs(camera.position.z - cameraTarget.z) < 1900) {
-        //         camera.position.setZ(camera.position.z + 20)
-        //     }
-        // }
-
-
         if (keys.any) {
+
+            if (keys.zoomIn && orbitCam.distance > 100) {
+                orbitCam.distance -= 4
+            }
+
+            if (keys.zoomOut && orbitCam.distance < 1000) {
+                orbitCam.distance += 4
+            }
 
             if (keys.left) {
                 orbitCam.angle.x -= 1
@@ -203,7 +198,7 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
             // gl.LINE_LOOP,  // primitive type
             0,             // offset
             // 6 * 6             // count
-            icosahedron.triangles.length * 3,
+            sphere.triangles.length * 3,
         )
 
         requestAnimationFrame(loop)

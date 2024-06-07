@@ -1,7 +1,5 @@
 
-import { Matrix4 } from "../math/matrix";
-import { Quaternion } from "../math/quaternion";
-import { Vec3 } from "../math/vector";
+import { Vec3, Matrix4, Quaternion } from "../math"
 
 
 
