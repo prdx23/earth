@@ -1,25 +1,26 @@
+import { loadImage } from "../utils"
 
 
 type Gl = WebGL2RenderingContext
 
 
 
-export class Shader {
-
-    vertFile: string
-    fragFile: string
-    program!: WebGLProgram
-    locations: Record<string, WebGLUniformLocation>
+export const webgl = {
 
 
-    constructor(vertFile: string, fragFile: string) {
-        this.vertFile = vertFile
-        this.fragFile = fragFile
-        this.locations = {}
-    }
+    init(width: number, height: number): Gl | null {
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        canvas.style.width = `${Math.floor(width / height * 1000)}px`
+        canvas.style.height = `${1000}px`
+
+        const gl = canvas.getContext('webgl2')
+        return gl
+    },
 
 
-    async load(gl: Gl, locationNames: string[]): Promise<void> {
+    async loadShader(gl: Gl, filename: string): Promise<WebGLProgram> {
 
         function createShader(gl: Gl, type: number, source: string) {
             const shader = gl.createShader(type)!
@@ -37,13 +38,13 @@ export class Shader {
         const vertexShader = createShader(
             gl,
             gl.VERTEX_SHADER,
-            (await import(`../shaders/${this.vertFile}.vert?raw`)).default
+            (await import(`../shaders/${filename}.vert?raw`)).default
         )
 
         const fragmentShader = createShader(
             gl,
             gl.FRAGMENT_SHADER,
-            (await import(`../shaders/${this.fragFile}.frag?raw`)).default,
+            (await import(`../shaders/${filename}.frag?raw`)).default,
         )
 
         const program = gl.createProgram()!
@@ -56,28 +57,41 @@ export class Shader {
             gl.deleteProgram(program)
         }
 
-        this.program = program
+        return program
+    },
 
-        for (const name of locationNames) {
-            this.locations[name] = gl.getUniformLocation(program, name)!
+
+    loadAttribute(
+        gl: Gl, name: string, shader: WebGLProgram, data: ArrayBufferLike,
+        size: number, type: number, normalize: boolean,
+        stride: number = 0, offset: number = 0
+    ): void {
+
+        const buffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+        gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW)
+
+        const position = gl.getAttribLocation(shader, name)
+        if (position == -1) {
+            console.warn(`Attribute Error: ${name} not found`)
+            return
         }
 
+        gl.enableVertexAttribArray(position)
+        gl.vertexAttribPointer(position, size, type, normalize, stride, offset)
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, null)
+    },
+
+
+    async loadTexture(gl: Gl, path: string): Promise<WebGLTexture | null> {
+        const image = await loadImage(path)
+        const texture = gl.createTexture()
+        gl.bindTexture(gl.TEXTURE_2D, texture)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image)
+        gl.generateMipmap(gl.TEXTURE_2D)
+        return texture
     }
 
 
 }
-
-
-export function initWebgl(width: number, height: number) {
-
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-    canvas.style.width = `${Math.floor(width / height * 1000)}px`
-    canvas.style.height = `${1000}px`
-
-    const gl = canvas.getContext('webgl2')
-    return gl
-}
-
-

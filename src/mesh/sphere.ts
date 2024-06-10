@@ -1,5 +1,4 @@
 
-import { Vec3 } from "../math"
 import { generateIcosahedron } from "./icosahedron"
 import { Triangle } from "./triangle"
 
