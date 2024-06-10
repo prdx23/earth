@@ -11,11 +11,11 @@ import { generateSphere } from './mesh/sphere'
 
 
 let gl: WebGL2RenderingContext
-const width = 800
-const height = 800
+const width =  4000
+const height = 4000
 
 
-const sphere = generateSphere(3)
+const sphere = generateSphere(5)
 
 
 export async function init() {
@@ -31,7 +31,7 @@ export async function init() {
     gl = glctx
     document.body.appendChild(gl.canvas as HTMLCanvasElement)
 
-    const shader = new Shader('main', 'main')
+    const shader = new Shader('texture', 'texture')
     await shader.load(gl, [
         // 'u_view_matrix', 'u_projection_matrix', 'u_matrix',
         'u_view_projection_matrix', 'u_matrix',
@@ -84,9 +84,46 @@ export async function init() {
     gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
 
+    const texture = gl.createTexture()
+    gl.bindTexture(gl.TEXTURE_2D, texture)
+
+
+    const image = new Image()
+    // image.src = 'src/textures/cloud_combined_2048.jpg'
+    // image.src = 'src/textures/land_ocean_ice_cloud_2048.jpg'
+    image.src = 'src/textures/world.200410.3x5400x2700.jpg'
+    // image.src = 'src/textures/world.200410.3x21600x10800.jpg'
+
+    image.addEventListener('load', function() {
+        gl.bindTexture(gl.TEXTURE_2D, texture)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image)
+        gl.generateMipmap(gl.TEXTURE_2D)
+
+
+    const textureC = gl.createTexture()
+    gl.bindTexture(gl.TEXTURE_2D, textureC)
+
+    const imageC = new Image()
+    imageC.src = 'src/textures/cloud_combined_2048.jpg'
+
+    imageC.addEventListener('load', function() {
+        gl.bindTexture(gl.TEXTURE_2D, textureC)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, imageC)
+        gl.generateMipmap(gl.TEXTURE_2D)
+    render(vao!, shader)
+    })
+
+      gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, textureC);
+
+    })
+
+
     setupInputHandlers()
 
-    render(vao!, shader)
+    // render(vao!, shader)
 
 }
 
@@ -105,6 +142,13 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
     gl.useProgram(shader.program)
     gl.bindVertexArray(vao)
 
+      var u_image0Location = gl.getUniformLocation(shader.program, "u_texture");
+      var u_image1Location = gl.getUniformLocation(shader.program, "u_cloud");
+
+
+  // set which texture units to render with.
+  gl.uniform1i(u_image0Location, 0);  // texture unit 0
+  gl.uniform1i(u_image1Location, 1);  // texture unit 1
 
 
     const camera = new Camera(
@@ -125,6 +169,7 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
     const start = document.timeline.currentTime as number
     let t
 
+        const timeUniformLocation = gl.getUniformLocation(shader.program, 'u_time')
 
     const objectMatrix = Matrix4.identity()
         // .multiply(Quaternion.axisAngle(new Vec3(0, 1, 0), t * 0.03 * 1 * Math.PI / 180).matrix())
@@ -132,7 +177,7 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
 
 
     function loop(dt: number) {
-        // t = dt - start
+        t = dt - start
 
         gl.clearColor(0, 0, 0, 1)
         gl.clear(gl.COLOR_BUFFER_BIT)
@@ -141,10 +186,13 @@ export function render(vao: WebGLVertexArrayObject, shader: Shader) {
         // gl.useProgram(shader.program)
         // gl.bindVertexArray(vao)
 
+        gl.uniform1f(timeUniformLocation, t)
+
+
 
         if (keys.any) {
 
-            if (keys.zoomIn && orbitCam.distance > 100) {
+            if (keys.zoomIn && orbitCam.distance > 150) {
                 orbitCam.distance -= 4
             }
 

@@ -73,8 +73,8 @@ export function initWebgl(width: number, height: number) {
     const canvas = document.createElement('canvas')
     canvas.width = width
     canvas.height = height
-    canvas.style.width = `${Math.floor(width / height * 800)}px`
-    canvas.style.height = `${800}px`
+    canvas.style.width = `${Math.floor(width / height * 1000)}px`
+    canvas.style.height = `${1000}px`
 
     const gl = canvas.getContext('webgl2')
     return gl
