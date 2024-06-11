@@ -6,6 +6,7 @@ import { Vec3, Matrix4, Quaternion } from "../math"
 export class Camera {
 
     position: Vec3
+    target: Vec3
 
     _matrix: Matrix4
     _lookAtMatrix: Matrix4
@@ -15,6 +16,7 @@ export class Camera {
 
     constructor(fov: number, aspect: number, near: number, far: number) {
         this.position = Vec3.zero()
+        this.target = Vec3.zero()
         this._matrix = Matrix4.identity()
         this._lookAtMatrix = Matrix4.identity()
         this._projectionMatrix = Matrix4.perspective(fov, aspect, near, far)
@@ -23,6 +25,7 @@ export class Camera {
 
 
     lookAt(target: Vec3): void {
+        this.target.copy(target)
         this._lookAtMatrix
             .identity()
             .lookAt(this.position, target, Vec3.up)
@@ -72,11 +75,7 @@ export class OrbitCamera {
             .multiply(this._qv.matrix())
             .translate(0, 0, this.distance)
 
-        camera.position.set(
-            this._matrix.matrix[12],
-            this._matrix.matrix[13],
-            this._matrix.matrix[14],
-        )
+        camera.position.setTranslationFromMatrix(this._matrix)
         camera.lookAt(Vec3.origin)
     }
 

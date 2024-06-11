@@ -13,7 +13,8 @@ uniform float u_time;
 uniform sampler2D u_texture;
 uniform sampler2D u_cloud;
 
-uniform vec3 u_inverse_light_direction;
+uniform vec3 u_light_direction;
+uniform vec3 u_view_direction;
 
 #define PI 3.1415926535898
 
@@ -21,7 +22,8 @@ uniform vec3 u_inverse_light_direction;
 void main() {
 
     vec3 normal = normalize(v_normal);
-    vec3 inverse_light_direction = normalize(u_inverse_light_direction);
+    vec3 light_direction = normalize(u_light_direction);
+    vec3 view_direction = normalize(u_view_direction);
 
 
     // sphere normals -> lambert cylindrical
@@ -32,11 +34,36 @@ void main() {
 
 
     // diffuse directional light
-    float light = dot(normal, inverse_light_direction);
+    float diffuse_intensity = 1.0;
+    float diffuse_light = diffuse_intensity * clamp(
+        dot(normal, -light_direction), 0.0, 1.0
+    );
 
 
-    vec4 color = texture(u_texture, uv);
-    color.rgb *= light;
+    // specular highlights
+    float shininess = 64.0;
+    float specular_intensity = 0.9;
+    float specular_light = pow(clamp(
+        dot(view_direction, reflect(-light_direction, normal)), 0.0, 1.0
+    ), shininess);
+    specular_light *= specular_intensity;
+    // specular_light *= specular_intensity * ceil(diffuse_light);
+
+
+    // ambient light
+    float ambient_light = 0.05;
+
+
+    // vec4 color = texture(u_texture, uv);
+    vec4 color = vec4(0.0, 1.0, 1.0, 1.0);
+    // color.rgb *= diffuse_light;
+    // color.rgb *= specular_light;
+    // color.rgb *= ambient_light;
+
+    color.rgb =
+        (color.rgb * diffuse_light) +
+        (color.rgb * specular_light) +
+        (color.rgb * ambient_light);
 
 
     fragColor = color;

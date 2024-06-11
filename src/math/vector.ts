@@ -1,3 +1,4 @@
+import { Matrix4 } from "./matrix"
 
 
 export class Vec3 {
@@ -12,10 +13,11 @@ export class Vec3 {
         this.z = z
     }
 
-    set(x: number, y: number, z: number): void {
+    set(x: number, y: number, z: number): Vec3 {
         this.x = x
         this.y = y
         this.z = z
+        return this
     }
 
     // setX(x: number): void {
@@ -159,6 +161,14 @@ export class Vec3 {
         return Vec3.zero().copy(a).add(
             Vec3.zero().copy(b).subtract(a).scale(0.5)
         )
+    }
+
+
+    setTranslationFromMatrix(mat: Matrix4): Vec3 {
+        this.x = mat.matrix[12]
+        this.y = mat.matrix[13]
+        this.z = mat.matrix[14]
+        return this
     }
 
 }

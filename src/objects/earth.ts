@@ -59,7 +59,7 @@ export class Earth {
         const uniforms = [
             'u_time', 'u_view_projection_matrix', 'u_matrix',
             'u_texture', 'u_cloud',
-            'u_inverse_light_direction',
+            'u_light_direction', 'u_view_direction',
         ]
         for (const uniform of uniforms) {
             this.uniforms[uniform] = gl.getUniformLocation(this.shader, uniform)!
@@ -83,7 +83,8 @@ export class Earth {
         gl: WebGL2RenderingContext,
         t: number,
         viewProjectionMatrix: Matrix4,
-        inverseLightDirection: Vec3,
+        lightDirection: Vec3,
+        viewDirection: Vec3,
     ) {
 
         gl.useProgram(this.shader)
@@ -92,8 +93,13 @@ export class Earth {
         gl.uniform1f(this.uniforms.u_time, t)
 
         gl.uniform3f(
-            this.uniforms.u_inverse_light_direction,
-            inverseLightDirection.x, inverseLightDirection.y, inverseLightDirection.z
+            this.uniforms.u_light_direction,
+            lightDirection.x, lightDirection.y, lightDirection.z
+        )
+
+        gl.uniform3f(
+            this.uniforms.u_view_direction,
+            viewDirection.x, viewDirection.y, viewDirection.z
         )
 
         gl.uniformMatrix4fv(

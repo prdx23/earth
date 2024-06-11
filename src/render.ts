@@ -53,7 +53,7 @@ export function render() {
 
 
     const camera = new Camera(
-        30 * Math.PI / 180,
+        20 * Math.PI / 180,
         // gl.canvas.clientWidth / gl.canvas.clientHeight,
         width / height,
         1, 3000,
@@ -78,7 +78,8 @@ export function render() {
     const q = Quaternion.identity()
 
     const lightPosition = Vec3.zero()
-    const inverseLightDirection = Vec3.zero()
+    const lightDirection = Vec3.zero()
+    const viewDirection = Vec3.zero()
 
 
     function loop(dt: number) {
@@ -128,19 +129,17 @@ export function render() {
             .multiply(q.setAxisAngle(Vec3.up, t * 0.1 * Math.PI / 180).matrix())
             .translate(200, 0, 0)
             .scale(10, 10, 10)
+        lightPosition.setTranslationFromMatrix(cube.matrix)
+        lightDirection.set(0, 0, 0).subtract(lightPosition)
 
-        lightPosition.set(
-            cube.matrix.matrix[12],
-            cube.matrix.matrix[13],
-            cube.matrix.matrix[14],
+        viewDirection.copy(camera.target).subtract(camera.position)
+
+
+        earth.render(
+            gl, t, viewProjectionMatrix, lightDirection, viewDirection
         )
 
-        inverseLightDirection.copy(lightPosition)
-
         cube.render(gl, t, viewProjectionMatrix)
-
-        earth.render(gl, t, viewProjectionMatrix, inverseLightDirection)
-
 
         requestAnimationFrame(loop)
     }
