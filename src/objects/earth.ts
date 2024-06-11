@@ -1,6 +1,6 @@
 
 import { webgl } from "../engine/webgl"
-import { Matrix4 } from "../math"
+import { Matrix4, Vec3 } from "../math"
 import { generateSphere } from "../mesh/sphere"
 
 
@@ -59,6 +59,7 @@ export class Earth {
         const uniforms = [
             'u_time', 'u_view_projection_matrix', 'u_matrix',
             'u_texture', 'u_cloud',
+            'u_inverse_light_direction',
         ]
         for (const uniform of uniforms) {
             this.uniforms[uniform] = gl.getUniformLocation(this.shader, uniform)!
@@ -78,12 +79,22 @@ export class Earth {
     }
 
 
-    render(gl: WebGL2RenderingContext, t: number, viewProjectionMatrix: Matrix4) {
+    render(
+        gl: WebGL2RenderingContext,
+        t: number,
+        viewProjectionMatrix: Matrix4,
+        inverseLightDirection: Vec3,
+    ) {
 
         gl.useProgram(this.shader)
         gl.bindVertexArray(this.vao)
 
         gl.uniform1f(this.uniforms.u_time, t)
+
+        gl.uniform3f(
+            this.uniforms.u_inverse_light_direction,
+            inverseLightDirection.x, inverseLightDirection.y, inverseLightDirection.z
+        )
 
         gl.uniformMatrix4fv(
             this.uniforms['u_view_projection_matrix'],

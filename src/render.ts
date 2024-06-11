@@ -3,6 +3,8 @@ import { webgl } from './engine/webgl'
 import { Camera, OrbitCamera } from './engine/camera'
 import { keys, setupInputHandlers } from './engine/keys'
 import { Earth } from './objects/earth'
+import { Cube } from './objects/cube'
+import { Quaternion, Vec3 } from './math'
 
 
 
@@ -12,6 +14,7 @@ const height = 4000
 
 
 const earth = new Earth()
+const cube = new Cube()
 
 
 export async function init() {
@@ -28,6 +31,7 @@ export async function init() {
     document.body.appendChild(gl.canvas as HTMLCanvasElement)
 
     await earth.load(gl)
+    await cube.load(gl)
 
 
     setupInputHandlers()
@@ -70,6 +74,11 @@ export function render() {
 
     earth.renderInit(gl)
 
+
+    const q = Quaternion.identity()
+
+    const lightPosition = Vec3.zero()
+    const inverseLightDirection = Vec3.zero()
 
 
     function loop(dt: number) {
@@ -115,7 +124,22 @@ export function render() {
 
         viewProjectionMatrix = camera.viewProjectionMatrix()
 
-        earth.render(gl, t, viewProjectionMatrix)
+        cube.matrix.identity()
+            .multiply(q.setAxisAngle(Vec3.up, t * 0.1 * Math.PI / 180).matrix())
+            .translate(200, 0, 0)
+            .scale(10, 10, 10)
+
+        lightPosition.set(
+            cube.matrix.matrix[12],
+            cube.matrix.matrix[13],
+            cube.matrix.matrix[14],
+        )
+
+        inverseLightDirection.copy(lightPosition)
+
+        cube.render(gl, t, viewProjectionMatrix)
+
+        earth.render(gl, t, viewProjectionMatrix, inverseLightDirection)
 
 
         requestAnimationFrame(loop)
