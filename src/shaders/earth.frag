@@ -10,8 +10,8 @@ in vec3 v_color;
 in vec3 v_normal;
 
 uniform float u_time;
-uniform sampler2D u_texture;
-uniform sampler2D u_cloud;
+uniform sampler2D u_land_texture;
+uniform sampler2D u_water_texture;
 
 uniform vec3 u_light_direction;
 uniform vec3 u_view_direction;
@@ -33,6 +33,12 @@ void main() {
     );
 
 
+    vec4 water_texture = texture(u_water_texture, uv);
+    float is_water = clamp(
+        ceil(water_texture.r + water_texture.g + water_texture.b), 0.0, 1.0
+    );
+
+
     // diffuse directional light
     float diffuse_intensity = 1.0;
     float diffuse_light = diffuse_intensity * clamp(
@@ -42,11 +48,11 @@ void main() {
 
     // specular highlights
     float shininess = 64.0;
-    float specular_intensity = 0.9;
+    float specular_intensity = 1.0;
     float specular_light = pow(clamp(
         dot(view_direction, reflect(-light_direction, normal)), 0.0, 1.0
     ), shininess);
-    specular_light *= specular_intensity;
+    specular_light *= specular_intensity * is_water;
     // specular_light *= specular_intensity * ceil(diffuse_light);
 
 
@@ -54,8 +60,9 @@ void main() {
     float ambient_light = 0.05;
 
 
-    // vec4 color = texture(u_texture, uv);
-    vec4 color = vec4(0.0, 1.0, 1.0, 1.0);
+    vec4 color = texture(u_land_texture, uv);
+    // vec4 color = texture(u_water_texture, uv);
+    // vec4 color = vec4(0.0, 1.0, 1.0, 1.0);
     // color.rgb *= diffuse_light;
     // color.rgb *= specular_light;
     // color.rgb *= ambient_light;

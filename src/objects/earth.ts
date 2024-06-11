@@ -24,7 +24,7 @@ export class Earth {
 
     async load(gl: WebGL2RenderingContext) {
 
-        const sphere = generateSphere(3)
+        const sphere = generateSphere(5)
         this.vertexCount = sphere.triangles.length * 3
 
         this.shader = await webgl.loadShader(gl, 'earth')
@@ -44,10 +44,12 @@ export class Earth {
 
         const texture1 = await webgl.loadTexture(
             gl, 'src/textures/world.200410.3x5400x2700.jpg'
+            // gl, 'untracked/NASA_Earth_Textures/earth_color_10K.jpg'
         )
 
         const texture2 = await webgl.loadTexture(
-            gl, 'src/textures/cloud_combined_2048.jpg'
+            gl, 'src/textures/earth_landocean_8K.png'
+            // gl, 'untracked/NASA_Earth_Textures/earth_landocean_4K.png'
         )
 
         gl.activeTexture(gl.TEXTURE0)
@@ -58,7 +60,7 @@ export class Earth {
 
         const uniforms = [
             'u_time', 'u_view_projection_matrix', 'u_matrix',
-            'u_texture', 'u_cloud',
+            'u_land_texture', 'u_water_texture',
             'u_light_direction', 'u_view_direction',
         ]
         for (const uniform of uniforms) {
@@ -74,8 +76,8 @@ export class Earth {
     renderInit(gl: WebGL2RenderingContext) {
         gl.useProgram(this.shader)
         gl.bindVertexArray(this.vao)
-        gl.uniform1i(this.uniforms.u_texture, 0)
-        gl.uniform1i(this.uniforms.u_cloud, 1)
+        gl.uniform1i(this.uniforms.u_land_texture, 0)
+        gl.uniform1i(this.uniforms.u_water_texture, 1)
     }
 
 
