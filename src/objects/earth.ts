@@ -48,19 +48,25 @@ export class Earth {
         )
 
         const texture2 = await webgl.loadTexture(
-            gl, 'src/textures/earth_landocean_8K.png'
+            gl, 'src/textures/earth_landocean_4K.png'
             // gl, 'untracked/NASA_Earth_Textures/earth_landocean_4K.png'
+        )
+
+        const texture3 = await webgl.loadTexture(
+            gl, 'src/textures/earth_nightlights_10K.jpg'
         )
 
         gl.activeTexture(gl.TEXTURE0)
         gl.bindTexture(gl.TEXTURE_2D, texture1)
         gl.activeTexture(gl.TEXTURE1)
         gl.bindTexture(gl.TEXTURE_2D, texture2)
+        gl.activeTexture(gl.TEXTURE2)
+        gl.bindTexture(gl.TEXTURE_2D, texture3)
 
 
         const uniforms = [
             'u_time', 'u_view_projection_matrix', 'u_matrix',
-            'u_land_texture', 'u_water_texture',
+            'u_land_texture', 'u_water_texture', 'u_nightlights_texture',
             'u_light_direction', 'u_view_direction',
         ]
         for (const uniform of uniforms) {
@@ -78,6 +84,7 @@ export class Earth {
         gl.bindVertexArray(this.vao)
         gl.uniform1i(this.uniforms.u_land_texture, 0)
         gl.uniform1i(this.uniforms.u_water_texture, 1)
+        gl.uniform1i(this.uniforms.u_nightlights_texture, 2)
     }
 
 

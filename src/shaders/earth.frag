@@ -12,6 +12,7 @@ in vec3 v_normal;
 uniform float u_time;
 uniform sampler2D u_land_texture;
 uniform sampler2D u_water_texture;
+uniform sampler2D u_nightlights_texture;
 
 uniform vec3 u_light_direction;
 uniform vec3 u_view_direction;
@@ -60,19 +61,32 @@ void main() {
     float ambient_light = 0.05;
 
 
-    vec4 color = texture(u_land_texture, uv);
-    // vec4 color = texture(u_water_texture, uv);
-    // vec4 color = vec4(0.0, 1.0, 1.0, 1.0);
+    vec4 earth_surface = texture(u_land_texture, uv);
+    // vec4 earth_surface = texture(u_water_texture, uv);
+    // vec4 earth_surface = vec4(0.0, 1.0, 1.0, 1.0);
     // color.rgb *= diffuse_light;
     // color.rgb *= specular_light;
     // color.rgb *= ambient_light;
 
-    color.rgb =
-        (color.rgb * diffuse_light) +
-        (color.rgb * specular_light) +
-        (color.rgb * ambient_light);
+    earth_surface.rgb =
+        (earth_surface.rgb * diffuse_light) +
+        (earth_surface.rgb * specular_light) +
+        (earth_surface.rgb * ambient_light);
 
 
-    fragColor = color;
+    float sun_facing = clamp(1.0 * dot(normal, light_direction), 0.0, 1.0);
+    vec3 night_lights = texture(u_nightlights_texture, uv).rgb;
+    night_lights = night_lights * vec3(0.6, 0.5, 0.4);
+
+
+    fragColor = vec4(
+        mix(
+            earth_surface.rgb,
+            night_lights.rgb,
+            sun_facing
+        ),
+        1.0
+    );
+
 }
 
