@@ -1,6 +1,6 @@
 
 import { webgl } from "../engine/webgl"
-import { Matrix4, Vec3 } from "../math"
+import { Matrix4, Quaternion, Vec3 } from "../math"
 import { generateSphere } from "../mesh/sphere"
 
 
@@ -74,7 +74,9 @@ export class Earth {
         }
 
 
-        this.matrix.scale(100, 100, 100)
+        this.matrix
+            .multiply(Quaternion.axisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
+            .scale(100, 100, 100)
 
     }
 

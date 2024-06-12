@@ -7,7 +7,8 @@ precision highp int;
 out vec4 fragColor;
 
 in vec3 v_color;
-in vec3 v_normal;
+in vec3 v_model_normal;
+in vec3 v_matrix_normal;
 in vec4 v_position;
 
 uniform float u_time;
@@ -23,15 +24,16 @@ const float gamma = 2.2;
 
 void main() {
 
-    vec3 normal = normalize(v_normal);
+    vec3 normal = normalize(v_matrix_normal);
     vec3 light_direction = normalize(u_light_direction);
     // vec3 light_direction = normalize(v_position.xyz - -u_light_direction);
 
 
     // sphere normals -> lambert cylindrical
+    vec3 model_normal = normalize(v_model_normal);
     vec2 uv = vec2(
-        (atan(normal.x, normal.z) / PI + 1.0) / 2.0,
-        asin(normal.y) / -PI + 0.5
+        (atan(model_normal.x, model_normal.z) / PI + 1.0) / 2.0,
+        asin(model_normal.y) / -PI + 0.5
     );
 
 
@@ -42,15 +44,18 @@ void main() {
 
 
     // diffuse directional light
-    float diffuse_intensity = 1.0;
+    float diffuse_intensity = 2.0;
     float diffuse_light = diffuse_intensity * max(
-        0.0, dot(normal, -light_direction)
+        0.0,
+        // stylized exponential dropoff
+        pow(dot(normal, -light_direction), gamma)
+        // dot(normal, -light_direction)
     );
 
 
     // specular highlights
     float shininess = 256.0;
-    float specular_intensity = 5.0;
+    float specular_intensity = 4.0;
     vec3 view_direction = normalize(u_camera_position - v_position.xyz);
     vec3 half_dir = normalize(-light_direction + view_direction);
     float specular_light = pow(max(0.0, dot(normal, half_dir)), shininess);
@@ -60,7 +65,7 @@ void main() {
 
 
     // ambient light
-    float ambient_light = 0.001;
+    float ambient_light = 0.0001;
 
 
     vec4 earth_surface = vec4(pow(texture(u_land_texture, uv).rgb, vec3(gamma)), 1.0);
@@ -76,11 +81,12 @@ void main() {
         (earth_surface.rgb * ambient_light);
 
 
-    float sun_facing = clamp(-1.0 * dot(
-        normal, normalize(v_position.xyz - (u_light_direction * 2.0))
-    ), 0.0, 1.0);
+    float sun_facing = clamp(
+        // stylized exponential dropoff
+        pow(dot(normal, light_direction), 3.0),
+    0.0, 1.0);
     vec3 night_lights = texture(u_nightlights_texture, uv).rgb;
-    night_lights = night_lights * vec3(0.6, 0.5, 0.4) * vec3(0.3);
+    night_lights = night_lights * vec3(0.6, 0.5, 0.4) * vec3(0.4);
 
 
     // vec4 output_color = vec4(earth_surface.rgb, 1.0);

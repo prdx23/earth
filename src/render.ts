@@ -125,9 +125,14 @@ export function render() {
 
         viewProjectionMatrix = camera.viewProjectionMatrix()
 
+        earth.matrix.identity()
+            .multiply(q.setAxisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
+            // .multiply(q.setAxisAngle(Vec3.up, t * -0.05 * Math.PI / 180).matrix())
+            .scale(100, 100, 100)
+
         cube.matrix.identity()
             .multiply(q.setAxisAngle(Vec3.up, t * -0.05 * Math.PI / 180).matrix())
-            .translate(200, 0, 0)
+            .translate(0, 0, 200)
             .scale(10, 10, 10)
         lightPosition.setTranslationFromMatrix(cube.matrix)
         lightDirection.set(0, 0, 0).subtract(lightPosition)
