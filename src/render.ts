@@ -132,11 +132,11 @@ export function render() {
         lightPosition.setTranslationFromMatrix(cube.matrix)
         lightDirection.set(0, 0, 0).subtract(lightPosition)
 
-        viewDirection.copy(camera.target).subtract(camera.position)
+        // viewDirection.copy(camera.target).subtract(camera.position)
 
 
         earth.render(
-            gl, t, viewProjectionMatrix, lightDirection, viewDirection
+            gl, t, viewProjectionMatrix, lightDirection, camera.position
         )
 
         cube.render(gl, t, viewProjectionMatrix)
