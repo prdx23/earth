@@ -5,15 +5,17 @@ import { keys, setupInputHandlers } from './engine/keys'
 import { Earth } from './objects/earth'
 import { Cube } from './objects/cube'
 import { Quaternion, Vec3 } from './math'
+import { Atmosphere } from './objects/atmosphere'
 
 
 
 let gl: WebGL2RenderingContext
-const width =  4000
-const height = 4000
+const width =  2000
+const height = 2000
 
 
 const earth = new Earth()
+const atmosphere = new Atmosphere()
 const cube = new Cube()
 
 
@@ -31,6 +33,7 @@ export async function init() {
     document.body.appendChild(gl.canvas as HTMLCanvasElement)
 
     await earth.load(gl)
+    await atmosphere.load(gl)
     await cube.load(gl)
 
 
@@ -56,13 +59,13 @@ export function render() {
         20 * Math.PI / 180,
         // gl.canvas.clientWidth / gl.canvas.clientHeight,
         width / height,
-        1, 3000,
+        1000, Earth.radius * 10,
     )
     // camera.position.set(0, 400, 1800)
     // camera.lookAt(Vec3.origin)
 
     const orbitCam = new OrbitCamera()
-    orbitCam.distance = 800
+    orbitCam.distance = Earth.radius * 8
     orbitCam.angle = { x: -30, y: -30 }
     orbitCam.updateCamera(camera)
 
@@ -73,6 +76,7 @@ export function render() {
 
 
     earth.renderInit(gl)
+    atmosphere.renderInit(gl)
 
 
     const q = Quaternion.identity()
@@ -87,6 +91,12 @@ export function render() {
 
         gl.clearColor(0, 0, 0, 1)
         gl.clear(gl.COLOR_BUFFER_BIT)
+
+
+        gl.blendFunc(gl.ONE, gl.ONE)
+        // gl.blendFunc( gl.SRC_ALPHA, gl.DST_ALPHA )
+        // gl.blendFunc( gl.SRC_ALPHA, gl.ONE )
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
         if (keys.any) {
@@ -127,22 +137,32 @@ export function render() {
 
         earth.matrix.identity()
             .multiply(q.setAxisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
-            // .multiply(q.setAxisAngle(Vec3.up, t * -0.05 * Math.PI / 180).matrix())
-            .scale(100, 100, 100)
+            .multiply(q.setAxisAngle(Vec3.up, t * -0.005 * Math.PI / 180).matrix())
+            .scale(Earth.radius, Earth.radius, Earth.radius)
+
+
+        atmosphere.matrix.copy(earth.matrix)
+
 
         cube.matrix.identity()
             .multiply(q.setAxisAngle(Vec3.up, t * -0.05 * Math.PI / 180).matrix())
-            .translate(0, 0, 200)
-            .scale(10, 10, 10)
+            .translate(0, 0, Earth.radius + 1000)
+            .scale(100, 100, 100)
         lightPosition.setTranslationFromMatrix(cube.matrix)
         lightDirection.set(0, 0, 0).subtract(lightPosition)
 
         // viewDirection.copy(camera.target).subtract(camera.position)
 
+        gl.enable(gl.BLEND)
 
         earth.render(
             gl, t, viewProjectionMatrix, lightDirection, camera.position
         )
+
+        atmosphere.render(
+            gl, t, viewProjectionMatrix, lightDirection, camera.position
+        )
+        gl.disable(gl.BLEND);
 
         cube.render(gl, t, viewProjectionMatrix)
 

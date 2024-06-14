@@ -44,7 +44,7 @@ void main() {
 
 
     // diffuse directional light
-    float diffuse_intensity = 2.0;
+    float diffuse_intensity = 1.0;
     float diffuse_light = diffuse_intensity * max(
         0.0,
         // stylized exponential dropoff
@@ -75,6 +75,12 @@ void main() {
     // earth_surface.rgb *= specular_light;
     // earth_surface.rgb *= ambient_light;
 
+    // if (is_water > 0.0) {
+    //     earth_surface.rgb = vec3(
+    //         (earth_surface.r + earth_surface.g + earth_surface.b) / 3.0
+    //     );
+    // }
+
     earth_surface.rgb =
         (earth_surface.rgb * diffuse_light) +
         (earth_surface.rgb * specular_light) +
@@ -98,6 +104,8 @@ void main() {
         ),
         1.0
     );
+
+    // output_color.rgb = vec3(0.0);
 
     // reinhard hdr tone mapping
     output_color.rgb = output_color.rgb / (output_color.rgb + vec3(1.0));
