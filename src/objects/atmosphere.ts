@@ -2,12 +2,13 @@
 import { webgl } from "../engine/webgl"
 import { Matrix4, Vec3 } from "../math"
 import { generateSphere } from "../mesh/sphere"
+import { Earth } from "./earth"
 
 
 
 export class Atmosphere {
 
-    static diameter = 1274.2 + 80.0
+    static height = 80.0
 
     vao: WebGLVertexArrayObject | null
     vertexCount: number
@@ -29,68 +30,41 @@ export class Atmosphere {
         const sphere = generateSphere(5)
         this.vertexCount = sphere.triangles.length * 3
 
-        // this.shader = await webgl.loadShader(gl, 'earth')
         this.shader = await webgl.loadShader(gl, 'atmosphere')
-        // this.shader = await webgl.loadShader(gl, 'atmos2')
 
         this.vao = gl.createVertexArray()
         gl.bindVertexArray(this.vao)
 
 
+        sphere.points.forEach(
+            (x, i, a) => a[i] = x * (Earth.radius + Atmosphere.height)
+        )
         webgl.loadAttribute(
             gl, 'a_position', this.shader, sphere.points, 3, gl.FLOAT, false
         )
 
-        // webgl.loadAttribute(
-        //     gl, 'a_color', this.shader, sphere.colors, 3, gl.UNSIGNED_BYTE, true
-        // )
-
-
-        // const texture1 = await webgl.loadTexture(
-        //     gl, 'src/textures/world.200410.3x5400x2700.jpg'
-        //     // gl, 'untracked/NASA_Earth_Textures/earth_color_10K.jpg'
-        // )
-
-        // const texture2 = await webgl.loadTexture(
-        //     gl, 'src/textures/earth_landocean_4K.png'
-        //     // gl, 'untracked/NASA_Earth_Textures/earth_landocean_4K.png'
-        // )
-
-        // const texture3 = await webgl.loadTexture(
-        //     gl, 'src/textures/earth_nightlights_10K.jpg'
-        // )
-
-        // gl.activeTexture(gl.TEXTURE0)
-        // gl.bindTexture(gl.TEXTURE_2D, texture1)
-        // gl.activeTexture(gl.TEXTURE1)
-        // gl.bindTexture(gl.TEXTURE_2D, texture2)
-        // gl.activeTexture(gl.TEXTURE2)
-        // gl.bindTexture(gl.TEXTURE_2D, texture3)
-
 
         const uniforms = [
             'u_time', 'u_view_projection_matrix', 'u_matrix',
-            // 'u_land_texture', 'u_water_texture', 'u_nightlights_texture',
             'u_light_direction', 'u_camera_position',
+            'earth_radius', 'atmos_height', 'atmos_radius', 'earth_center',
         ]
         for (const uniform of uniforms) {
             this.uniforms[uniform] = gl.getUniformLocation(this.shader, uniform)!
         }
 
+        gl.useProgram(this.shader)
+        gl.bindVertexArray(this.vao)
+        gl.uniform1f(this.uniforms.earth_radius, Earth.radius)
+        gl.uniform1f(this.uniforms.atmos_height, Atmosphere.height)
+        gl.uniform1f(
+            this.uniforms.atmos_radius, Earth.radius + Atmosphere.height
+        )
+        gl.uniform3f(
+            this.uniforms.earth_center,
+            Earth.center.x, Earth.center.y, Earth.center.z
+        )
 
-        // this.matrix
-        //     .multiply(Quaternion.axisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
-        //     .scale(100, 100, 100)
-
-    }
-
-
-    renderInit(gl: WebGL2RenderingContext) {
-        // gl.useProgram(this.shader)
-        // gl.bindVertexArray(this.vao)
-        // gl.uniform1i(this.uniforms.u_land_texture, 0)
-        // gl.uniform1i(this.uniforms.u_water_texture, 1)
-        // gl.uniform1i(this.uniforms.u_nightlights_texture, 2)
     }
 
 

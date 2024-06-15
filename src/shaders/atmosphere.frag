@@ -6,35 +6,18 @@ precision highp int;
 
 out vec4 fragColor;
 
-in vec3 v_color;
-in vec3 v_model_normal;
-in vec3 v_matrix_normal;
 in vec4 v_position;
 
-// uniform float u_time;
-// uniform sampler2D u_land_texture;
-// uniform sampler2D u_water_texture;
-// uniform sampler2D u_nightlights_texture;
 uniform vec3 u_light_direction;
 uniform vec3 u_camera_position;
+uniform float earth_radius;
+uniform float atmos_radius;
+uniform float atmos_height;
+uniform vec3 earth_center;
 
 
 const float gamma = 2.2;
 #define PI 3.1415926535898
-
-
-
-
-// temp uniforms
-const float earth_scaling_factor = 10000.0;
-const vec3 earth_center = vec3(0.0, 0.0, 0.0);
-// const float earth_diameter = 1274.2;
-const float earth_radius = 1274.2 / 2.0;
-const float atmos_height = 80.0;
-const float atmos_radius = earth_radius + atmos_height;
-
-
-
 
 
 
@@ -51,8 +34,9 @@ vec2 sphere_intersect(in vec3 ro, in vec3 rd, in vec3 ce, float ra) {
 
 float density_at_point(in vec3 point) {
     float height = distance(point, earth_center) - earth_radius;
-    float scale_height = atmos_height * 1000.0 / earth_scaling_factor;
+    // float scale_height = atmos_height * 1000.0 / earth_scaling_factor;
     // float scale_height = 8500.0 / earth_scaling_factor;
+    float scale_height = 0.10 * atmos_height;
     float density = exp(-height / scale_height);
     // float height01 = height / atmos_height;
     // float falloff = 26.1;
@@ -82,13 +66,7 @@ vec3 calc_scatter_light(
     in vec3 light_direction
 ) {
 
-    vec3 scattering_coefficient = vec3(
-        0.0519673,
-        0.121427,
-        0.296453
-    ) * 0.1;
-
-
+    vec3 scattering_coefficient = vec3(0.00519673, 0.0121427, 0.0296453);
     int num_of_samples = 10;
     float step = ray_length / float(num_of_samples);
     vec3 current_point = ray_origin + (ray_direction * (step * 0.5));
@@ -132,18 +110,10 @@ vec3 calc_scatter_light(
 
 void main() {
 
-    vec3 normal = normalize(v_matrix_normal);
-    vec3 light_direction = normalize(u_light_direction);
-    // vec3 light_direction = normalize(v_position.xyz - -u_light_direction);
-
-
-    vec3 view_direction = normalize(v_position.xyz - u_camera_position);
-
     vec4 output_color = vec4(0.0, 0.0, 0.0, 0.0);
-
-
+    vec3 light_direction = normalize(u_light_direction);
     vec3 ray_origin = v_position.xyz;
-    vec3 ray_direction = view_direction;
+    vec3 ray_direction = normalize(v_position.xyz - u_camera_position);
     float ray_length = -1.0;
 
     vec2 intersect_earth = sphere_intersect(
@@ -162,14 +132,9 @@ void main() {
         // output_color.rgb = vec3(0.0, 0.0, (ray_length) / (atmos_radius * 2.0));
     }
 
-
-
     output_color.rgb = calc_scatter_light(
         ray_origin, ray_direction, ray_length, light_direction
     );
-
-
-
 
     // reinhard hdr tone mapping
     output_color.rgb = output_color.rgb / (output_color.rgb + vec3(1.0));

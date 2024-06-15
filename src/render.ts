@@ -75,15 +75,9 @@ export function render() {
     let t
 
 
-    earth.renderInit(gl)
-    atmosphere.renderInit(gl)
-
-
     const q = Quaternion.identity()
-
     const lightPosition = Vec3.zero()
     const lightDirection = Vec3.zero()
-    const viewDirection = Vec3.zero()
 
 
     function loop(dt: number) {
@@ -94,8 +88,6 @@ export function render() {
 
 
         gl.blendFunc(gl.ONE, gl.ONE)
-        // gl.blendFunc( gl.SRC_ALPHA, gl.DST_ALPHA )
-        // gl.blendFunc( gl.SRC_ALPHA, gl.ONE )
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
@@ -137,34 +129,28 @@ export function render() {
 
         earth.matrix.identity()
             .multiply(q.setAxisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
-            .multiply(q.setAxisAngle(Vec3.up, t * -0.005 * Math.PI / 180).matrix())
-            .scale(Earth.radius, Earth.radius, Earth.radius)
-
-
-        atmosphere.matrix.copy(earth.matrix)
+            .multiply(q.setAxisAngle(Vec3.up, ((t * -0.005) % 360) * Math.PI / 180).matrix())
 
 
         cube.matrix.identity()
-            .multiply(q.setAxisAngle(Vec3.up, t * -0.05 * Math.PI / 180).matrix())
+            .multiply(q.setAxisAngle(Vec3.up, ((t * -0.05) % 360) * Math.PI / 180).matrix())
             .translate(0, 0, Earth.radius + 1000)
             .scale(100, 100, 100)
         lightPosition.setTranslationFromMatrix(cube.matrix)
         lightDirection.set(0, 0, 0).subtract(lightPosition)
 
-        // viewDirection.copy(camera.target).subtract(camera.position)
 
-        gl.enable(gl.BLEND)
+        cube.render(gl, t, viewProjectionMatrix)
 
         earth.render(
             gl, t, viewProjectionMatrix, lightDirection, camera.position
         )
 
+        gl.enable(gl.BLEND)
         atmosphere.render(
             gl, t, viewProjectionMatrix, lightDirection, camera.position
         )
         gl.disable(gl.BLEND);
-
-        cube.render(gl, t, viewProjectionMatrix)
 
         requestAnimationFrame(loop)
     }

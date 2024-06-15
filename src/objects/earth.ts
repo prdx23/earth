@@ -1,6 +1,6 @@
 
 import { webgl } from "../engine/webgl"
-import { Matrix4, Quaternion, Vec3 } from "../math"
+import { Matrix4, Vec3 } from "../math"
 import { generateSphere } from "../mesh/sphere"
 
 
@@ -8,6 +8,8 @@ import { generateSphere } from "../mesh/sphere"
 export class Earth {
 
     static radius = 1274.2 / 2.0
+    static center = Vec3.zero()
+    static scalingFactor = 10000.0
 
     vao: WebGLVertexArrayObject | null
     vertexCount: number
@@ -35,29 +37,29 @@ export class Earth {
         gl.bindVertexArray(this.vao)
 
 
+        sphere.points.forEach((x, i, a) => a[i] = x * Earth.radius)
         webgl.loadAttribute(
             gl, 'a_position', this.shader, sphere.points, 3, gl.FLOAT, false
         )
-
-        webgl.loadAttribute(
-            gl, 'a_color', this.shader, sphere.colors, 3, gl.UNSIGNED_BYTE, true
-        )
-
 
         const texture1 = await webgl.loadTexture(
             gl, 'src/textures/world.200410.3x5400x2700.jpg'
             // gl, 'untracked/NASA_Earth_Textures/earth_color_10K.jpg'
         )
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 
         const texture2 = await webgl.loadTexture(
-            // gl, 'src/textures/earth_landocean_4K.png'
+            gl, 'src/textures/earth_landocean_4K.png'
             // gl, 'src/textures/specular_map_8k.jpg'
-            gl, 'untracked/NASA_Earth_Textures/earth_landocean_8K.png'
+            // gl, 'untracked/NASA_Earth_Textures/earth_landocean_8K.png'
         )
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 
         const texture3 = await webgl.loadTexture(
             gl, 'src/textures/earth_nightlights_10K.jpg'
         )
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+
 
         gl.activeTexture(gl.TEXTURE0)
         gl.bindTexture(gl.TEXTURE_2D, texture1)
@@ -76,20 +78,12 @@ export class Earth {
             this.uniforms[uniform] = gl.getUniformLocation(this.shader, uniform)!
         }
 
-
-        // this.matrix
-        //     .multiply(Quaternion.axisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
-        //     .scale(100, 100, 100)
-
-    }
-
-
-    renderInit(gl: WebGL2RenderingContext) {
         gl.useProgram(this.shader)
         gl.bindVertexArray(this.vao)
         gl.uniform1i(this.uniforms.u_land_texture, 0)
         gl.uniform1i(this.uniforms.u_water_texture, 1)
         gl.uniform1i(this.uniforms.u_nightlights_texture, 2)
+
     }
 
 
