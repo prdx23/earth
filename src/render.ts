@@ -6,6 +6,7 @@ import { Earth } from './objects/earth'
 import { Cube } from './objects/cube'
 import { Quaternion, Vec3 } from './math'
 import { Atmosphere } from './objects/atmosphere'
+import { Stars } from './objects/stars'
 
 
 
@@ -17,6 +18,7 @@ const height = 2000
 const earth = new Earth()
 const atmosphere = new Atmosphere()
 const cube = new Cube()
+const stars = new Stars()
 
 
 export async function init() {
@@ -35,6 +37,7 @@ export async function init() {
     await earth.load(gl)
     await atmosphere.load(gl)
     await cube.load(gl)
+    await stars.load(gl)
 
 
     setupInputHandlers()
@@ -68,6 +71,7 @@ export function render() {
     orbitCam.distance = Earth.radius * 8
     orbitCam.angle = { x: -30, y: -30 }
     orbitCam.updateCamera(camera)
+    let camera_untouched = true
 
     let viewProjectionMatrix = camera.viewProjectionMatrix()
 
@@ -92,6 +96,8 @@ export function render() {
 
 
         if (keys.any) {
+
+            camera_untouched = false
 
             if (keys.zoomIn && orbitCam.distance > 150) {
                 orbitCam.distance -= 4
@@ -120,6 +126,11 @@ export function render() {
             orbitCam.updateCamera(camera)
         }
 
+        if (camera_untouched) {
+            orbitCam.angle.x = (orbitCam.angle.x - 0.01) % 360
+            orbitCam.updateCamera(camera)
+        }
+
         // camera.matrix
         //     .identity()
         //     .translate(camera.position.x, camera.position.y, camera.position.z)
@@ -129,12 +140,12 @@ export function render() {
 
         earth.matrix.identity()
             .multiply(q.setAxisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
-            .multiply(q.setAxisAngle(Vec3.up, ((t * -0.005) % 360) * Math.PI / 180).matrix())
+            .multiply(q.setAxisAngle(Vec3.up, ((t * 0.005) % 360) * Math.PI / 180).matrix())
 
 
         cube.matrix.identity()
-            .multiply(q.setAxisAngle(Vec3.up, ((t * -0.05) % 360) * Math.PI / 180).matrix())
-            .translate(0, 0, Earth.radius + 1000)
+            // .multiply(q.setAxisAngle(Vec3.up, ((t * -0.05) % 360) * Math.PI / 180).matrix())
+            .translate(1000, 0, Earth.radius + 1000)
             .scale(100, 100, 100)
         lightPosition.setTranslationFromMatrix(cube.matrix)
         lightDirection.set(0, 0, 0).subtract(lightPosition)
@@ -145,6 +156,8 @@ export function render() {
         earth.render(
             gl, t, viewProjectionMatrix, lightDirection, camera.position
         )
+
+        stars.render(gl, viewProjectionMatrix.inverse())
 
         gl.enable(gl.BLEND)
         atmosphere.render(

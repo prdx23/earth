@@ -42,12 +42,14 @@ export class Earth {
             gl, 'a_position', this.shader, sphere.points, 3, gl.FLOAT, false
         )
 
+        gl.activeTexture(gl.TEXTURE0)
         const texture1 = await webgl.loadTexture(
             gl, 'src/textures/world.200410.3x5400x2700.jpg'
             // gl, 'untracked/NASA_Earth_Textures/earth_color_10K.jpg'
         )
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 
+        gl.activeTexture(gl.TEXTURE1)
         const texture2 = await webgl.loadTexture(
             gl, 'src/textures/earth_landocean_4K.png'
             // gl, 'src/textures/specular_map_8k.jpg'
@@ -55,25 +57,27 @@ export class Earth {
         )
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 
+        gl.activeTexture(gl.TEXTURE2)
         const texture3 = await webgl.loadTexture(
             gl, 'src/textures/earth_nightlights_10K.jpg'
         )
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 
+        gl.activeTexture(gl.TEXTURE3)
         const texture4 = await webgl.loadTexture(
             gl, 'src/textures/earth_clouds_8K.jpg'
         )
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 
 
-        gl.activeTexture(gl.TEXTURE0)
-        gl.bindTexture(gl.TEXTURE_2D, texture1)
-        gl.activeTexture(gl.TEXTURE1)
-        gl.bindTexture(gl.TEXTURE_2D, texture2)
-        gl.activeTexture(gl.TEXTURE2)
-        gl.bindTexture(gl.TEXTURE_2D, texture3)
-        gl.activeTexture(gl.TEXTURE3)
-        gl.bindTexture(gl.TEXTURE_2D, texture4)
+        // gl.activeTexture(gl.TEXTURE0)
+        // gl.bindTexture(gl.TEXTURE_2D, texture1)
+        // gl.activeTexture(gl.TEXTURE1)
+        // gl.bindTexture(gl.TEXTURE_2D, texture2)
+        // gl.activeTexture(gl.TEXTURE2)
+        // gl.bindTexture(gl.TEXTURE_2D, texture3)
+        // gl.activeTexture(gl.TEXTURE3)
+        // gl.bindTexture(gl.TEXTURE_2D, texture4)
 
 
         const uniforms = [
