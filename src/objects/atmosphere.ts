@@ -70,7 +70,6 @@ export class Atmosphere {
 
     render(
         gl: WebGL2RenderingContext,
-        t: number,
         viewProjectionMatrix: Matrix4,
         lightDirection: Vec3,
         cameraPosition: Vec3,
@@ -78,8 +77,6 @@ export class Atmosphere {
 
         gl.useProgram(this.shader)
         gl.bindVertexArray(this.vao)
-
-        gl.uniform1f(this.uniforms.u_time, t)
 
         gl.uniform3f(
             this.uniforms.u_light_direction,

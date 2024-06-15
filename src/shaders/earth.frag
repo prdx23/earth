@@ -10,11 +10,8 @@ in vec3 v_model_normal;
 in vec3 v_matrix_normal;
 in vec4 v_position;
 
-uniform float u_time;
-uniform sampler2D u_land_texture;
-uniform sampler2D u_water_texture;
-uniform sampler2D u_nightlights_texture;
-uniform sampler2D u_clouds_texture;
+uniform sampler2D u_earth_texture;
+uniform sampler2D u_data_texture;
 uniform vec3 u_light_direction;
 uniform vec3 u_camera_position;
 
@@ -38,6 +35,9 @@ void main() {
     );
 
 
+    vec3 data = texture(u_data_texture, uv).rgb;
+
+
     // diffuse directional light
     float diffuse_intensity = 1.0;
     float diffuse_light = diffuse_intensity * max(
@@ -50,8 +50,7 @@ void main() {
 
 
     // specular highlights
-    vec4 water = texture(u_water_texture, uv);
-    float specular_brightness = (water.r + water.g + water.b) / 3.0;
+    float specular_brightness = data.r;
     float shininess = 128.0;
     float specular_intensity = 8.0;
     vec3 view_direction = normalize(u_camera_position - v_position.xyz);
@@ -67,7 +66,7 @@ void main() {
 
 
 
-    vec3 earth_surface = pow(texture(u_land_texture, uv).rgb, vec3(gamma));
+    vec3 earth_surface = pow(texture(u_earth_texture, uv).rgb, vec3(gamma));
     // if (specular_brightness > 0.0) {
     //     earth_surface.rgb = vec3(
     //         (earth_surface.r + earth_surface.g + earth_surface.b) / 3.0
@@ -80,23 +79,24 @@ void main() {
 
 
     // vec3 clouds = pow(texture(u_clouds_texture, uv).rgb, vec3(gamma));
-    vec3 clouds = texture(u_clouds_texture, uv).rgb;
-    float is_clouds = (clouds.r + clouds.g + clouds.b) / 3.0;
-
+    vec3 clouds = vec3(data.g);
+    float is_clouds = data.g;
     vec3 earth = mix(
         earth_surface,
-        (clouds.rgb * diffuse_light) + (clouds.rgb * ambient_light),
+        (clouds * diffuse_light) + (clouds * ambient_light),
         is_clouds
     );
 
 
     float sun_facing = clamp(pow(dot(normal, light_direction), 3.0), 0.0, 1.0);
-    vec3 night_lights_texture = texture(u_nightlights_texture, uv).rgb;
-    night_lights_texture *= vec3(0.6, 0.5, 0.4) * vec3(0.4);
+    float nightlights_intensity = 0.4;
+    vec3 nightlights_colortone = vec3(0.6, 0.5, 0.4);
+    vec3 nightlights_texture = vec3(data.b);
+    nightlights_texture *= nightlights_colortone * nightlights_intensity;
 
-    vec3 night_lights = mix(
-        night_lights_texture,
-        clouds.rgb * 0.003,
+    vec3 nightlights = mix(
+        nightlights_texture,
+        clouds * 0.003,
         is_clouds
     );
 
@@ -104,7 +104,7 @@ void main() {
     vec4 output_color = vec4(
         mix(
             earth,
-            night_lights,
+            nightlights,
             sun_facing
         ),
         1.0

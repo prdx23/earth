@@ -39,6 +39,10 @@ export async function init() {
     await cube.load(gl)
     await stars.load(gl)
 
+    document.getElementById('msg')!.innerHTML += '\n webgl loaded! '
+    document.getElementById('msg')!.innerHTML += `${
+        gl.getParameter(gl.MAX_TEXTURE_SIZE)
+    }`
 
     setupInputHandlers()
     render()
@@ -48,6 +52,7 @@ export async function init() {
 
 export function render() {
 
+    document.getElementById('msg')!.innerHTML += '\nloaded!'
 
     gl.enable(gl.CULL_FACE)
     gl.enable(gl.DEPTH_TEST)
@@ -72,20 +77,38 @@ export function render() {
     orbitCam.angle = { x: -30, y: -30 }
     orbitCam.updateCamera(camera)
     let camera_untouched = true
-
     let viewProjectionMatrix = camera.viewProjectionMatrix()
-
-    const start = document.timeline.currentTime as number
-    let t
 
 
     const q = Quaternion.identity()
     const lightPosition = Vec3.zero()
     const lightDirection = Vec3.zero()
 
+    const fps = 60
+    const fpsInterval = 1000 / fps
+    let now = 0
+    let then = window.performance.now()
+    const startTime = then
+    let elapsed = 0
+    let sinceStart = 0
+    let currentFps = 0
+    let frames = 0
+    const fpstag = document.getElementById('fps')!
 
     function loop(dt: number) {
-        t = dt - start
+
+        requestAnimationFrame(loop)
+
+        now = dt
+        elapsed = now - then
+
+        if (elapsed < fpsInterval) { return }
+        then = now - (elapsed % fpsInterval)
+
+        sinceStart = now - startTime
+        currentFps = Math.round(1000 / (sinceStart / ++frames) * 100) / 100
+        fpstag.innerHTML = `${currentFps} fps`
+
 
         gl.clearColor(0, 0, 0, 1)
         gl.clear(gl.COLOR_BUFFER_BIT)
@@ -140,7 +163,7 @@ export function render() {
 
         earth.matrix.identity()
             .multiply(q.setAxisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
-            .multiply(q.setAxisAngle(Vec3.up, ((t * 0.005) % 360) * Math.PI / 180).matrix())
+            .multiply(q.setAxisAngle(Vec3.up, ((frames * 0.05) % 360) * Math.PI / 180).matrix())
 
 
         cube.matrix.identity()
@@ -151,21 +174,20 @@ export function render() {
         lightDirection.set(0, 0, 0).subtract(lightPosition)
 
 
-        cube.render(gl, t, viewProjectionMatrix)
+        cube.render(gl, frames, viewProjectionMatrix)
 
         earth.render(
-            gl, t, viewProjectionMatrix, lightDirection, camera.position
+            gl, viewProjectionMatrix, lightDirection, camera.position
         )
 
         stars.render(gl, viewProjectionMatrix.inverse())
 
         gl.enable(gl.BLEND)
         atmosphere.render(
-            gl, t, viewProjectionMatrix, lightDirection, camera.position
+            gl, viewProjectionMatrix, lightDirection, camera.position
         )
         gl.disable(gl.BLEND);
 
-        requestAnimationFrame(loop)
     }
     loop(0)
 }
