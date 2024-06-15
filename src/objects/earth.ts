@@ -60,6 +60,11 @@ export class Earth {
         )
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
 
+        const texture4 = await webgl.loadTexture(
+            gl, 'src/textures/earth_clouds_8K.jpg'
+        )
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+
 
         gl.activeTexture(gl.TEXTURE0)
         gl.bindTexture(gl.TEXTURE_2D, texture1)
@@ -67,11 +72,14 @@ export class Earth {
         gl.bindTexture(gl.TEXTURE_2D, texture2)
         gl.activeTexture(gl.TEXTURE2)
         gl.bindTexture(gl.TEXTURE_2D, texture3)
+        gl.activeTexture(gl.TEXTURE3)
+        gl.bindTexture(gl.TEXTURE_2D, texture4)
 
 
         const uniforms = [
             'u_time', 'u_view_projection_matrix', 'u_matrix',
-            'u_land_texture', 'u_water_texture', 'u_nightlights_texture',
+            'u_land_texture', 'u_water_texture',
+            'u_nightlights_texture', 'u_clouds_texture',
             'u_light_direction', 'u_camera_position',
         ]
         for (const uniform of uniforms) {
@@ -83,6 +91,7 @@ export class Earth {
         gl.uniform1i(this.uniforms.u_land_texture, 0)
         gl.uniform1i(this.uniforms.u_water_texture, 1)
         gl.uniform1i(this.uniforms.u_nightlights_texture, 2)
+        gl.uniform1i(this.uniforms.u_clouds_texture, 3)
 
     }
 

@@ -14,6 +14,7 @@ uniform float u_time;
 uniform sampler2D u_land_texture;
 uniform sampler2D u_water_texture;
 uniform sampler2D u_nightlights_texture;
+uniform sampler2D u_clouds_texture;
 uniform vec3 u_light_direction;
 uniform vec3 u_camera_position;
 
@@ -47,13 +48,10 @@ void main() {
     );
 
 
-    vec4 water = texture(u_water_texture, uv);
-    float specular_brightness = (water.r + water.g + water.b) / 3.0;
-    // float is_water = clamp(
-    //     ceil(water_texture.r + water_texture.g + water_texture.b), 0.0, 1.0
-    // );
 
     // specular highlights
+    vec4 water = texture(u_water_texture, uv);
+    float specular_brightness = (water.r + water.g + water.b) / 3.0;
     float shininess = 128.0;
     float specular_intensity = 8.0;
     vec3 view_direction = normalize(u_camera_position - v_position.xyz);
@@ -68,38 +66,45 @@ void main() {
     float ambient_light = 0.0001;
 
 
-    vec4 earth_surface = vec4(pow(texture(u_land_texture, uv).rgb, vec3(gamma)), 1.0);
-    // vec4 earth_surface = texture(u_water_texture, uv);
-    // vec4 earth_surface = vec4(0.0, 1.0, 1.0, 1.0);
-    // earth_surface.rgb *= diffuse_light;
-    // earth_surface.rgb *= specular_light;
-    // earth_surface.rgb *= ambient_light;
 
-    // if (is_water > 0.0) {
+    vec3 earth_surface = pow(texture(u_land_texture, uv).rgb, vec3(gamma));
+    // if (specular_brightness > 0.0) {
     //     earth_surface.rgb = vec3(
     //         (earth_surface.r + earth_surface.g + earth_surface.b) / 3.0
     //     );
     // }
+    earth_surface =
+        (earth_surface * diffuse_light) +
+        (earth_surface * specular_light) +
+        (earth_surface * ambient_light);
 
-    earth_surface.rgb =
-        (earth_surface.rgb * diffuse_light) +
-        (earth_surface.rgb * specular_light) +
-        (earth_surface.rgb * ambient_light);
+
+    // vec3 clouds = pow(texture(u_clouds_texture, uv).rgb, vec3(gamma));
+    vec3 clouds = texture(u_clouds_texture, uv).rgb;
+    float is_clouds = (clouds.r + clouds.g + clouds.b) / 3.0;
+
+    vec3 earth = mix(
+        earth_surface,
+        (clouds.rgb * diffuse_light) + (clouds.rgb * ambient_light),
+        is_clouds
+    );
 
 
-    float sun_facing = clamp(
-        // stylized exponential dropoff
-        pow(dot(normal, light_direction), 3.0),
-    0.0, 1.0);
-    vec3 night_lights = texture(u_nightlights_texture, uv).rgb;
-    night_lights *= vec3(0.6, 0.5, 0.4) * vec3(0.8);
+    float sun_facing = clamp(pow(dot(normal, light_direction), 3.0), 0.0, 1.0);
+    vec3 night_lights_texture = texture(u_nightlights_texture, uv).rgb;
+    night_lights_texture *= vec3(0.6, 0.5, 0.4) * vec3(0.4);
 
+    vec3 night_lights = mix(
+        night_lights_texture,
+        clouds.rgb * 0.003,
+        is_clouds
+    );
 
     // vec4 output_color = vec4(earth_surface.rgb, 1.0);
     vec4 output_color = vec4(
         mix(
-            earth_surface.rgb,
-            night_lights.rgb,
+            earth,
+            night_lights,
             sun_facing
         ),
         1.0
