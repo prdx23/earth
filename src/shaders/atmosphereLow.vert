@@ -4,9 +4,13 @@ precision highp float;
 precision highp int;
 
 
-out vec4 fragColor;
+in vec4 a_position;
 
-in vec4 v_position;
+out vec3 v_scatter_light;
+out vec4 v_position;
+
+uniform mat4 u_view_projection_matrix;
+uniform mat4 u_matrix;
 
 uniform vec3 u_light_direction;
 uniform vec3 u_camera_position;
@@ -16,8 +20,6 @@ uniform float atmos_height;
 uniform vec3 earth_center;
 uniform sampler2D u_optical_depth_texture;
 
-
-const float gamma = 2.2;
 #define PI 3.1415926535898
 
 
@@ -47,6 +49,7 @@ float density_at_point(in vec3 point) {
 
 
 float optical_depth(in vec3 ray_origin, in vec3 ray_direction, in float ray_length) {
+
     int num_of_samples = 10;
     float step = ray_length / float(num_of_samples);
     vec3 current_point = ray_origin + (ray_direction * (step * 0.5));
@@ -121,46 +124,46 @@ vec3 calc_scatter_light(
 
     float sun_intensity = 1.0;
 
-    return sun_intensity * scattering_coefficient * phase * light;
-    // return scattering_coefficient * light;
+    // return sun_intensity * scattering_coefficient * phase * light;
+    return scattering_coefficient * light;
 }
+
+
 
 
 void main() {
+    v_position = u_matrix * a_position;
 
-    vec4 output_color = vec4(0.0, 0.0, 0.0, 0.0);
+    vec4 position = u_matrix * a_position;
+
+    vec3 output_color = vec3(0.0, 0.0, 0.0);
     vec3 light_direction = normalize(u_light_direction);
-    vec3 ray_origin = v_position.xyz;
-    vec3 ray_direction = normalize(v_position.xyz - u_camera_position);
+    vec3 ray_origin = position.xyz;
+    vec3 ray_direction = normalize(position.xyz - u_camera_position);
     float ray_length = -1.0;
 
-    vec2 intersect_earth = sphere_intersect(
-        ray_origin, ray_direction, earth_center, earth_radius
-    );
+    if (dot(-ray_direction, normalize(position.xyz)) > 0.0) {
+        vec2 intersect_earth = sphere_intersect(
+            ray_origin, ray_direction, earth_center, earth_radius
+        );
 
-    vec2 intersect_atmos = sphere_intersect(
-        ray_origin, ray_direction, earth_center, atmos_radius
-    );
+        vec2 intersect_atmos = sphere_intersect(
+            ray_origin, ray_direction, earth_center, atmos_radius
+        );
 
-    if (intersect_atmos.y >= 0.0) {
-        ray_length = intersect_atmos.y - intersect_atmos.x;
-        if (intersect_earth.y >= 0.0) {
-            ray_length = intersect_earth.x - intersect_atmos.x;
+        if (intersect_atmos.y >= 0.0) {
+            ray_length = intersect_atmos.y - intersect_atmos.x;
+            if (intersect_earth.y >= 0.0) {
+                ray_length = intersect_earth.x - intersect_atmos.x;
+            }
         }
-        // output_color.rgb = vec3(0.0, 0.0, (ray_length) / (atmos_radius * 2.0));
+
+        output_color = calc_scatter_light(
+            ray_origin, ray_direction, ray_length, light_direction
+        );
     }
 
-    output_color.rgb = calc_scatter_light(
-        ray_origin, ray_direction, ray_length, light_direction
-    );
+    v_scatter_light = output_color;
 
-    // reinhard hdr tone mapping
-    output_color.rgb = output_color.rgb / (output_color.rgb + vec3(1.0));
-
-    // gamma correction
-    output_color.rgb = pow(output_color.rgb, vec3(1.0 / gamma));
-
-    fragColor = output_color;
-
+    gl_Position = u_view_projection_matrix * u_matrix * a_position;
 }
-

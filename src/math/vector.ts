@@ -62,21 +62,25 @@ export class Vec3 {
 
     // --------------------------
 
-    // static add(a: Vec3, b: Vec3): Vec3 {
-    //     return new Vec3(a.x + b.x, a.y + b.y, a.z + b.z)
-    // }
+    static add(a: Vec3, b: Vec3): Vec3 {
+        return new Vec3(a.x + b.x, a.y + b.y, a.z + b.z)
+    }
 
-    // static subtract(a: Vec3, b: Vec3): Vec3 {
-    //     return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z)
-    // }
+    static subtract(a: Vec3, b: Vec3): Vec3 {
+        return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z)
+    }
 
-    // static multiply(a: Vec3, b: Vec3): Vec3 {
-    //     return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z)
-    // }
+    static multiply(a: Vec3, b: Vec3): Vec3 {
+        return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z)
+    }
 
-    // static divide(a: Vec3, b: Vec3): Vec3 {
-    //     return new Vec3(a.x / b.x, a.y / b.y, a.z / b.z)
-    // }
+    static divide(a: Vec3, b: Vec3): Vec3 {
+        return new Vec3(a.x / b.x, a.y / b.y, a.z / b.z)
+    }
+
+    static scale(a: Vec3, b: number): Vec3 {
+        return new Vec3(a.x * b, a.y * b, a.z * b)
+    }
 
     // --------------------------
 

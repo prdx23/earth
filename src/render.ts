@@ -150,7 +150,7 @@ export function render() {
         }
 
         if (camera_untouched) {
-            orbitCam.angle.x = (orbitCam.angle.x - 0.01) % 360
+            orbitCam.angle.x = (orbitCam.angle.x - (0.2 * elapsed / 1000)) % 360
             orbitCam.updateCamera(camera)
         }
 
@@ -167,7 +167,7 @@ export function render() {
 
 
         cube.matrix.identity()
-            // .multiply(q.setAxisAngle(Vec3.up, ((t * -0.05) % 360) * Math.PI / 180).matrix())
+            // .multiply(q.setAxisAngle(Vec3.up, ((frames * -0.05) % 360) * Math.PI / 180).matrix())
             .translate(1000, 0, Earth.radius + 1000)
             .scale(100, 100, 100)
         lightPosition.setTranslationFromMatrix(cube.matrix)
