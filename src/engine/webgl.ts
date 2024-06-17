@@ -12,11 +12,38 @@ export const webgl = {
         const canvas = document.createElement('canvas')
         canvas.width = width
         canvas.height = height
-        canvas.style.width = `${Math.floor(width / height * 1000)}px`
-        canvas.style.height = `${1000}px`
+        // canvas.style.width = `${Math.floor(width / height * 1000)}px`
+        // canvas.style.height = `${1000}px`
 
         const gl = canvas.getContext('webgl2')
         return gl
+    },
+
+
+    resizeToScreen(gl: Gl) {
+
+        const canvas = gl.canvas as HTMLCanvasElement
+        const dwidth  = canvas.clientWidth
+        const dheight = canvas.clientHeight
+        const res = 2000
+
+        let cwidth
+        let cheight
+
+        if (dwidth >= dheight) {
+            cwidth = res
+            cheight = res * dheight / dwidth
+        } else {
+            cheight = res
+            cwidth = res * dwidth / dheight
+        }
+
+        if (canvas.width != cwidth || canvas.height != cheight) {
+            canvas.width = cwidth
+            canvas.height = cheight
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
+        }
+
     },
 
 

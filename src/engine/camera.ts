@@ -7,6 +7,10 @@ export class Camera {
 
     position: Vec3
     target: Vec3
+    fov: number
+    aspect: number
+    near: number
+    far: number
 
     _matrix: Matrix4
     _lookAtMatrix: Matrix4
@@ -17,9 +21,14 @@ export class Camera {
     constructor(fov: number, aspect: number, near: number, far: number) {
         this.position = Vec3.zero()
         this.target = Vec3.zero()
+        this.fov = fov
+        this.aspect = aspect
+        this.near = near
+        this.far = far
         this._matrix = Matrix4.identity()
         this._lookAtMatrix = Matrix4.identity()
-        this._projectionMatrix = Matrix4.perspective(fov, aspect, near, far)
+        this._projectionMatrix = Matrix4.identity()
+            .perspective(fov, aspect, near, far)
         this._viewProjectionMatrix = Matrix4.identity()
     }
 
@@ -29,6 +38,13 @@ export class Camera {
         this._lookAtMatrix
             .identity()
             .lookAt(this.position, target, Vec3.up)
+    }
+
+
+    updateProjectionMatrix(): void {
+        this._projectionMatrix.perspective(
+            this.fov, this.aspect, this.near, this.far
+        )
     }
 
 
@@ -76,7 +92,7 @@ export class OrbitCamera {
             .translate(0, 0, this.distance)
 
         camera.position.setTranslationFromMatrix(this._matrix)
-        camera.lookAt(Vec3.origin)
+        camera.lookAt(camera.target)
     }
 
 }

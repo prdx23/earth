@@ -266,17 +266,18 @@ export class Matrix4 {
     // }
 
 
-    static perspective(
+    perspective(
         fovInRadians: number, aspect: number, near: number, far: number
     ): Matrix4 {
         const f = Math.tan(Math.PI * 0.5 - 0.5 * fovInRadians)
         const rangeInv = 1.0 / (near - far)
-        return new Matrix4([
+        this.set(
             f / aspect, 0, 0, 0,
             0, f, 0, 0,
             0, 0, (near + far) * rangeInv, -1,
             0, 0, near * far * rangeInv * 2, 0
-        ])
+        )
+        return this
     }
 
     lookAt(cameraPosition: Vec3, target: Vec3, up: Vec3): Matrix4 {

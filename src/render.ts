@@ -11,6 +11,7 @@ import { Stars } from './objects/stars'
 
 
 let gl: WebGL2RenderingContext
+let canvas: HTMLCanvasElement
 const width =  2000
 const height = 2000
 
@@ -32,7 +33,8 @@ export async function init() {
     }
 
     gl = glctx
-    document.body.appendChild(gl.canvas as HTMLCanvasElement)
+    canvas = gl.canvas as HTMLCanvasElement
+    document.getElementById('webgl-canvas')!.appendChild(canvas)
 
     await earth.load(gl)
     await atmosphere.load(gl)
@@ -57,29 +59,24 @@ export function render() {
     gl.enable(gl.CULL_FACE)
     gl.enable(gl.DEPTH_TEST)
 
-
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
-    gl.clearColor(0, 0, 0, 1)
-    gl.clear(gl.COLOR_BUFFER_BIT)
-
-
     const camera = new Camera(
         20 * Math.PI / 180,
-        // gl.canvas.clientWidth / gl.canvas.clientHeight,
         width / height,
-        1000, Earth.radius * 10,
+        Earth.radius * 2, Earth.radius * 14,
     )
+    // camera.target.set(0, -Earth.radius * 0.2, 0)
     // camera.position.set(0, 400, 1800)
     // camera.lookAt(Vec3.origin)
 
     const orbitCam = new OrbitCamera()
-    orbitCam.distance = Earth.radius * 8
+    orbitCam.distance = Earth.radius * 10
     orbitCam.angle = { x: -30, y: -30 }
     orbitCam.updateCamera(camera)
     let camera_untouched = true
     let viewProjectionMatrix = camera.viewProjectionMatrix()
 
 
+    let earthRotationAngle = 0
     const q = Quaternion.identity()
     const lightPosition = Vec3.zero()
     const lightDirection = Vec3.zero()
@@ -111,9 +108,6 @@ export function render() {
 
 
         gl.clearColor(0, 0, 0, 1)
-        gl.clear(gl.COLOR_BUFFER_BIT)
-
-
         gl.blendFunc(gl.ONE, gl.ONE)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -150,20 +144,31 @@ export function render() {
         }
 
         if (camera_untouched) {
-            orbitCam.angle.x = (orbitCam.angle.x - (0.2 * elapsed / 1000)) % 360
+            orbitCam.angle.x = (
+                orbitCam.angle.x - (0.1 * elapsed / 1000)
+            ) % 360
             orbitCam.updateCamera(camera)
         }
 
-        // camera.matrix
-        //     .identity()
-        //     .translate(camera.position.x, camera.position.y, camera.position.z)
-        //     .lookAt(camera.position, cameraTarget, Vec3.up)
+        webgl.resizeToScreen(gl)
+        camera.aspect = canvas.width / canvas.height
 
+        camera.fov = Math.sin((Earth.radius * 1.4) / orbitCam.distance) * 2
+        if (canvas.height > canvas.width) {
+            camera.fov *= canvas.height / canvas.width
+        }
+
+        camera.updateProjectionMatrix()
         viewProjectionMatrix = camera.viewProjectionMatrix()
 
+        earthRotationAngle += (1.0 * elapsed / 1000) % 360
         earth.matrix.identity()
-            .multiply(q.setAxisAngle(Vec3.front, -23.5 * Math.PI / 180).matrix())
-            .multiply(q.setAxisAngle(Vec3.up, ((frames * 0.05) % 360) * Math.PI / 180).matrix())
+            .multiply(q.setAxisAngle(
+                Vec3.front, -23.5 * Math.PI / 180
+            ).matrix())
+            .multiply(q.setAxisAngle(
+                Vec3.up, earthRotationAngle * Math.PI / 180
+            ).matrix())
 
 
         cube.matrix.identity()
