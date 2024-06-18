@@ -35,13 +35,8 @@ vec2 sphere_intersect(in vec3 ro, in vec3 rd, in vec3 ce, float ra) {
 
 float density_at_point(in vec3 point) {
     float height = distance(point, earth_center) - earth_radius;
-    // float scale_height = atmos_height * 1000.0 / earth_scaling_factor;
-    // float scale_height = 8500.0 / earth_scaling_factor;
     float scale_height = 0.10 * atmos_height;
     float density = exp(-height / scale_height);
-    // float height01 = height / atmos_height;
-    // float falloff = 26.1;
-    // float density = exp(-height01 * falloff) * (1.0 - height01);
     return density;
 }
 

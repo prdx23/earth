@@ -71,12 +71,27 @@
 
     <body>
         <main>
+
             <section id='webgl-canvas'> </section>
+
             <section id='loading'>
                 Loading
                 <pre id='loading-bar'>[■■--------]</pre>
             </section>
-            <p id='fps' style='font-size: 48px'></p>
+
+            <section id='fps'></section>
+
+            <article id='content' style='display: none'>
+                <h1>earth</h1>
+                <nav>
+                    <a href='#'>controls</a>
+                    <a href='#'>about</a>
+                    <!-- | quality: -->
+                    <!-- <a class='selected' href='#'>high</a> -->
+                    <!-- <a href='#'>low</a> -->
+                </nav>
+            </article>
+
         </main>
         <script type='module' src='/src/main.ts'></script>
     </body>

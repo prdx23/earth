@@ -57,7 +57,7 @@ export class Atmosphere {
         const texture2 = gl.createTexture()
         gl.bindTexture(gl.TEXTURE_2D, texture2)
         gl.texImage2D(
-            gl.TEXTURE_2D, 0, gl.R16F,
+            gl.TEXTURE_2D, 0, gl.R32F,
             tableSize, tableSize, 0, gl.RED, gl.FLOAT, bakedOpticalDepth
         )
 

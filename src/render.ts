@@ -58,6 +58,7 @@ async function render() {
 
     webgl.loading.status = false
     document.getElementById('loading')!.style.display = 'none'
+    document.getElementById('content')!.style.display = 'block'
 
     gl.enable(gl.CULL_FACE)
     gl.enable(gl.DEPTH_TEST)
@@ -107,7 +108,7 @@ async function render() {
 
         sinceStart = now - startTime
         currentFps = Math.round(1000 / (sinceStart / ++frames) * 100) / 100
-        fpstag.innerHTML = `${currentFps} fps`
+        fpstag.innerHTML = `${currentFps}fps`
 
 
         gl.clearColor(0, 0, 0, 1)

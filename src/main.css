@@ -1,3 +1,53 @@
+
+@font-face {
+    font-family: 'Iosevka-Glitchcomet';
+    font-display: swap;
+    font-weight: 400;
+    font-style: normal;
+    src: url('./assets/iosevka-glitchcomet-regular.woff2') format('woff2'),
+         url('./assets/iosevka-glitchcomet-regular.ttf') format('truetype');
+}
+
 :root {
 }
 
+html {
+    font-family: 'Iosevka-Glitchcomet', monospace;
+}
+
+#fps {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: min(20px, 2vmin);
+    background-color: black;
+    font-size: min(12px, 2vmin);
+    color: #9299b1;
+}
+
+#content {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    padding: min(30px, 5vmin);
+}
+
+#content h1 {
+    margin: 0;
+    color: #9299b1;
+    /* font-size: 20px; */
+}
+
+#content nav {
+    color: #aeaebe;
+}
+
+#content nav a {
+    color: #aeaebe;
+}
+
+#content nav .selected {
+    color: #aedeff;
+    text-decoration: none;
+    cursor: default;
+}
