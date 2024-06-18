@@ -1,3 +1,4 @@
+import { webgl } from "./engine/webgl"
 
 
 
@@ -6,7 +7,8 @@ export function loadImage(path: string): Promise<HTMLImageElement> {
         const image = new Image()
         image.src = path
         image.addEventListener('load', () => {
-            document.getElementById('msg')!.innerHTML += `\n ${path} loaded!`
+            webgl.loading.progress += 3
+            webgl.updateLoading()
             resolve(image)
         })
     })

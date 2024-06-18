@@ -40,10 +40,10 @@ export class Triangle {
         const v1v3mid = Vec3.midpoint(this.v1, this.v3)
 
         const triangles = [
-            new Triangle(this.v1, v1v2mid, v1v3mid),
+            new Triangle(v2v3mid, this.v3, v1v3mid),
+            new Triangle(v1v3mid, this.v1, v1v2mid),
             new Triangle(v1v2mid, this.v2, v2v3mid),
-            new Triangle(v1v3mid, v2v3mid, this.v3),
-            new Triangle(v1v2mid, v2v3mid, v1v3mid),
+            new Triangle(v1v3mid, v1v2mid, v2v3mid),
         ]
 
         return Triangle.subdivideAll(triangles, depth - 1)

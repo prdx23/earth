@@ -1,9 +1,12 @@
 
-import { webgl } from "../engine/webgl"
-import { Matrix4, Vec3 } from "../math"
-import { generateSphere } from "../mesh/sphere"
-import { loadImage } from "../utils"
+import { webgl } from '../engine/webgl'
+import { Matrix4, Vec3 } from '../math'
+import { generateSphere } from '../mesh/sphere'
+import { loadImage } from '../utils'
 
+
+import vertex from '../shaders/earth.vert'
+import fragment from '../shaders/earth.frag'
 
 
 export class Earth {
@@ -32,7 +35,7 @@ export class Earth {
         const sphere = generateSphere(5)
         this.vertexCount = sphere.triangles.length * 3
 
-        this.shader = await webgl.loadShader(gl, 'earth')
+        this.shader = webgl.loadShader(gl, vertex, fragment)
 
         this.vao = gl.createVertexArray()
         gl.bindVertexArray(this.vao)

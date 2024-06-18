@@ -2,6 +2,9 @@
 import { webgl } from '../engine/webgl'
 import { loadImage } from '../utils'
 
+import vertex from '../shaders/textureOptimize.vert'
+import fragment from '../shaders/textureOptimize.frag'
+
 
 export async function run() {
 
@@ -9,7 +12,7 @@ export async function run() {
 
     document.body.appendChild(gl.canvas as HTMLCanvasElement)
 
-    const shader = await webgl.loadShader(gl, 'textureOptimize')
+    const shader = webgl.loadShader(gl, vertex, fragment)
 
     const vao = gl.createVertexArray()
     gl.bindVertexArray(vao)

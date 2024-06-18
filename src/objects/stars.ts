@@ -1,7 +1,9 @@
 
-import { webgl } from "../engine/webgl"
-import { Matrix4 } from "../math"
+import { webgl } from '../engine/webgl'
+import { Matrix4 } from '../math'
 
+import vertex from '../shaders/stars.vert'
+import fragment from '../shaders/stars.frag'
 
 export class Stars {
 
@@ -20,7 +22,7 @@ export class Stars {
 
     async load(gl: WebGL2RenderingContext) {
 
-        this.shader = await webgl.loadShader(gl, 'stars')
+        this.shader = webgl.loadShader(gl, vertex, fragment)
 
         this.vao = gl.createVertexArray()
         gl.bindVertexArray(this.vao)

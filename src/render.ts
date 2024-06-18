@@ -7,6 +7,7 @@ import { Cube } from './objects/cube'
 import { Quaternion, Vec3 } from './math'
 import { Atmosphere } from './objects/atmosphere'
 import { Stars } from './objects/stars'
+import { loading } from './loading'
 
 
 
@@ -36,25 +37,27 @@ export async function init() {
     canvas = gl.canvas as HTMLCanvasElement
     document.getElementById('webgl-canvas')!.appendChild(canvas)
 
+    loading(gl, canvas)
+    await render()
+}
+
+
+async function render() {
+
+
     await earth.load(gl)
+
+    webgl.loading.progress += 2
+    webgl.updateLoading()
+
     await atmosphere.load(gl)
     await cube.load(gl)
     await stars.load(gl)
 
-    document.getElementById('msg')!.innerHTML += '\n webgl loaded! '
-    document.getElementById('msg')!.innerHTML += `${
-        gl.getParameter(gl.MAX_TEXTURE_SIZE)
-    }`
-
     setupInputHandlers()
-    render()
 
-}
-
-
-export function render() {
-
-    document.getElementById('msg')!.innerHTML += '\nloaded!'
+    webgl.loading.status = false
+    document.getElementById('loading')!.style.display = 'none'
 
     gl.enable(gl.CULL_FACE)
     gl.enable(gl.DEPTH_TEST)
@@ -116,13 +119,13 @@ export function render() {
 
             camera_untouched = false
 
-            if (keys.zoomIn && orbitCam.distance > 150) {
-                orbitCam.distance -= 4
-            }
+            // if (keys.zoomIn && orbitCam.distance > 150) {
+            //     orbitCam.distance -= 4
+            // }
 
-            if (keys.zoomOut && orbitCam.distance < 1000) {
-                orbitCam.distance += 4
-            }
+            // if (keys.zoomOut && orbitCam.distance < 1000) {
+            //     orbitCam.distance += 4
+            // }
 
             if (keys.left) {
                 orbitCam.angle.x -= 1
@@ -179,7 +182,7 @@ export function render() {
         lightDirection.set(0, 0, 0).subtract(lightPosition)
 
 
-        cube.render(gl, frames, viewProjectionMatrix)
+        // cube.render(gl, frames, viewProjectionMatrix)
 
         earth.render(
             gl, viewProjectionMatrix, lightDirection, camera.position

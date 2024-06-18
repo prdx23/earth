@@ -47,7 +47,7 @@ export const webgl = {
     },
 
 
-    async loadShader(gl: Gl, filename: string): Promise<WebGLProgram> {
+    loadShader(gl: Gl, vertexSource: string, fragSource: string): WebGLProgram {
 
         function createShader(gl: Gl, type: number, source: string) {
             const shader = gl.createShader(type)!
@@ -62,17 +62,8 @@ export const webgl = {
             return shader
         }
 
-        const vertexShader = createShader(
-            gl,
-            gl.VERTEX_SHADER,
-            (await import(`../shaders/${filename}.vert?raw`)).default
-        )
-
-        const fragmentShader = createShader(
-            gl,
-            gl.FRAGMENT_SHADER,
-            (await import(`../shaders/${filename}.frag?raw`)).default,
-        )
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource)
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragSource)
 
         const program = gl.createProgram()!
         gl.attachShader(program, vertexShader)
@@ -124,5 +115,22 @@ export const webgl = {
     //     return texture
     // }
 
+    loading: {
+        status: true,
+        progress: 2,
+    },
+
+    updateLoading() {
+        let text = '['
+        for (let i = 0; i < 10; i++) {
+            if (i < this.loading.progress) {
+                text += '■'
+            } else {
+                text += '-'
+            }
+        }
+        text += ']'
+        document.getElementById('loading-bar')!.innerText = text
+    }
 
 }

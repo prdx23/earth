@@ -1,7 +1,9 @@
 
-import { webgl } from "../engine/webgl"
-import { Matrix4 } from "../math"
+import { webgl } from '../engine/webgl'
+import { Matrix4 } from '../math'
 
+import vertex from '../shaders/main.vert'
+import fragment from '../shaders/main.frag'
 
 export class Cube {
 
@@ -22,7 +24,7 @@ export class Cube {
 
     async load(gl: WebGL2RenderingContext) {
 
-        this.shader = await webgl.loadShader(gl, 'main')
+        this.shader = webgl.loadShader(gl, vertex, fragment)
 
         this.vao = gl.createVertexArray()
         gl.bindVertexArray(this.vao)

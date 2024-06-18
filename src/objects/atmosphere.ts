@@ -1,10 +1,15 @@
 
-import { webgl } from "../engine/webgl"
-import { Matrix4, Vec3 } from "../math"
-import { generateSphere } from "../mesh/sphere"
-import { generateOpticalDepthTable } from "../tools/bakeOpticalDepth"
-import { Earth } from "./earth"
+import { webgl } from '../engine/webgl'
+import { Matrix4, Vec3 } from '../math'
+import { generateSphere } from '../mesh/sphere'
+import { generateOpticalDepthTable } from '../tools/bakeOpticalDepth'
+import { Earth } from './earth'
 
+
+import vertex from '../shaders/atmosphere.vert'
+import fragment from '../shaders/atmosphere.frag'
+// import vertexLow from '../shaders/atmosphereLow.vert'
+// import fragmentLow from '../shaders/atmosphereLow.frag'
 
 
 export class Atmosphere {
@@ -31,8 +36,8 @@ export class Atmosphere {
         const sphere = generateSphere(5)
         this.vertexCount = sphere.triangles.length * 3
 
-        this.shader = await webgl.loadShader(gl, 'atmosphere')
-        // this.shader = await webgl.loadShader(gl, 'atmosphereLow')
+        this.shader = webgl.loadShader(gl, vertex, fragment)
+        // this.shader = webgl.loadShader(gl, vertexLow, fragmentLow)
 
         this.vao = gl.createVertexArray()
         gl.bindVertexArray(this.vao)
