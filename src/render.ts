@@ -29,7 +29,7 @@ export async function init() {
     const glctx = webgl.init(width, height)
 
     if( !glctx ) {
-        alert('webgl2 not available!')
+        document.getElementById('loading-bar')!.innerText = 'error: webgl2 not available!'
         return
     }
 
@@ -76,7 +76,7 @@ async function render() {
     orbitCam.distance = Earth.radius * 10
     orbitCam.angle = { x: -30, y: -30 }
     orbitCam.updateCamera(camera)
-    let camera_untouched = true
+    let cameraUntouched = true
     let viewProjectionMatrix = camera.viewProjectionMatrix()
 
 
@@ -117,37 +117,10 @@ async function render() {
 
 
         if (keys.any) {
-
-            camera_untouched = false
-
-            // if (keys.zoomIn && orbitCam.distance > 150) {
-            //     orbitCam.distance -= 4
-            // }
-
-            // if (keys.zoomOut && orbitCam.distance < 1000) {
-            //     orbitCam.distance += 4
-            // }
-
-            if (keys.left) {
-                orbitCam.angle.x -= 1
-            }
-
-            if (keys.right) {
-                orbitCam.angle.x += 1
-            }
-
-            if (keys.up && orbitCam.angle.y > -89) {
-                orbitCam.angle.y -= 1
-            }
-
-            if (keys.down && orbitCam.angle.y < 89) {
-                orbitCam.angle.y += 1
-            }
-
-            orbitCam.updateCamera(camera)
+            cameraUntouched = false
         }
 
-        if (camera_untouched) {
+        if (cameraUntouched) {
             orbitCam.angle.x = (
                 orbitCam.angle.x - (0.1 * elapsed / 1000)
             ) % 360
@@ -160,6 +133,18 @@ async function render() {
         camera.fov = Math.sin((Earth.radius * 1.4) / orbitCam.distance) * 2
         if (canvas.height > canvas.width) {
             camera.fov *= canvas.height / canvas.width
+        }
+        camera.fov += orbitCam.fovDelta
+
+
+        orbitCam.handleInput(camera)
+
+
+        if (cameraUntouched) {
+            orbitCam.angle.x = (
+                orbitCam.angle.x - (0.1 * elapsed / 1000)
+            ) % 360
+            orbitCam.updateCamera(camera)
         }
 
         camera.updateProjectionMatrix()

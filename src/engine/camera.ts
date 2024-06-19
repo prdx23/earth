@@ -1,5 +1,6 @@
 
 import { Vec3, Matrix4, Quaternion } from "../math"
+import { keys, mouse } from "./keys"
 
 
 
@@ -64,8 +65,17 @@ export class Camera {
 
 export class OrbitCamera {
 
+    static angleSpeed = 1
+    static dragSpeed = 0.1
+    static yLimitLower = -89
+    static yLimitUpper = 89
+    static zoomLimitLower = -4 * Math.PI / 180
+    static zoomLimitUpper = 60 * Math.PI / 180
+
     distance: number
-    angle: { x: number, y: number }
+    angle:  { x: number, y: number }
+    offset: { x: number, y: number }
+    fovDelta: number
 
     _qh: Quaternion
     _qv: Quaternion
@@ -75,15 +85,85 @@ export class OrbitCamera {
     constructor() {
         this.distance = 0
         this.angle = { x: 0, y: 0 }
+        this.offset = { x: 0, y: 0 }
+        this.fovDelta = 0
         this._qh = Quaternion.identity()
         this._qv = Quaternion.identity()
         this._matrix = Matrix4.identity()
     }
 
 
+    handleInput(camera: Camera): void {
+
+        if (keys.any) {
+
+            if (keys.zoomIn && camera.fov + this.fovDelta > OrbitCamera.zoomLimitLower) {
+                this.fovDelta -= 0.005
+            }
+
+            if (keys.zoomOut && camera.fov + this.fovDelta < OrbitCamera.zoomLimitUpper) {
+                this.fovDelta += 0.005
+            }
+
+            if (keys.left) {
+                this.angle.x -= OrbitCamera.angleSpeed
+            }
+
+            if (keys.right) {
+                this.angle.x += OrbitCamera.angleSpeed
+            }
+
+            if (keys.up && this.angle.y > OrbitCamera.yLimitLower) {
+                this.angle.y -= OrbitCamera.angleSpeed
+            }
+
+            if (keys.down && this.angle.y < OrbitCamera.yLimitUpper) {
+                this.angle.y += OrbitCamera.angleSpeed
+            }
+
+            this.updateCamera(camera)
+        }
+
+        if (mouse.dragging) {
+
+            this.offset.x = mouse.offsetX * OrbitCamera.dragSpeed
+
+            const newY = this.angle.y + mouse.offsetY * OrbitCamera.dragSpeed
+            if (newY > OrbitCamera.yLimitLower && newY < OrbitCamera.yLimitUpper) {
+                this.offset.y = mouse.offsetY * OrbitCamera.dragSpeed
+            }
+
+            this.updateCamera(camera)
+        }
+
+        if (mouse.zoom != 0) {
+            const delta = mouse.zoom * 0.0001
+            if (
+                camera.fov + this.fovDelta + delta > OrbitCamera.zoomLimitLower &&
+                camera.fov + this.fovDelta + delta < OrbitCamera.zoomLimitUpper
+            ) {
+                this.fovDelta += delta
+                mouse.zoom = 0
+                this.updateCamera(camera)
+            }
+        }
+
+        if (mouse.finalize) {
+            this.angle.x += this.offset.x
+            this.angle.y += this.offset.y
+            this.offset.x = 0
+            this.offset.y = 0
+            mouse.finalize = false
+            this.updateCamera(camera)
+        }
+    }
+
+
     updateCamera(camera: Camera): void {
-        this._qh.setAxisAngle(Vec3.up, this.angle.x * Math.PI / 180)
-        this._qv.setAxisAngle(Vec3.right, this.angle.y * Math.PI / 180)
+        const angleX = (this.angle.x + this.offset.x) * Math.PI / 180
+        const angleY = (this.angle.y + this.offset.y) * Math.PI / 180
+        this._qh.setAxisAngle(Vec3.up, angleX)
+        this._qv.setAxisAngle(Vec3.right, angleY)
 
         this._matrix
             .identity()

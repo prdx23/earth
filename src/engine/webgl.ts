@@ -15,7 +15,10 @@ export const webgl = {
         // canvas.style.width = `${Math.floor(width / height * 1000)}px`
         // canvas.style.height = `${1000}px`
 
-        const gl = canvas.getContext('webgl2')
+        const gl = canvas.getContext('webgl2', {
+            antialias: true,
+            alpha: false,
+        })
         return gl
     },
 

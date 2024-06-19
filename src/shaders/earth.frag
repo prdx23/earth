@@ -87,28 +87,29 @@ void main() {
         is_clouds
     );
 
-
-    float sun_facing = clamp(pow(dot(normal, light_direction), 3.0), 0.0, 1.0);
     float nightlights_intensity = 0.4;
     vec3 nightlights_colortone = vec3(0.6, 0.5, 0.4);
     vec3 nightlights_texture = vec3(data.b);
     nightlights_texture *= nightlights_colortone * nightlights_intensity;
 
+    float nightlight_dropoff = clamp(
+        pow(dot(normal, light_direction), gamma),
+        0.0, 1.0
+    );
     vec3 nightlights = mix(
         nightlights_texture,
         clouds * 0.003,
         is_clouds
-    );
+    ) * nightlight_dropoff;
 
-    // vec4 output_color = vec4(earth_surface.rgb, 1.0);
-    vec4 output_color = vec4(
-        mix(
-            earth,
-            nightlights,
-            sun_facing
-        ),
-        1.0
-    );
+    float sun_facing = ceil(max(0.0, dot(normal, -light_direction)));
+    vec4 output_color = vec4(0.0, 0.0, 1.0, 1.0);
+
+    if (sun_facing == 1.0) {
+        output_color.rgb = earth;
+    } else {
+        output_color.rgb = nightlights;
+    }
 
     // output_color.rgb = vec3(0.0);
 

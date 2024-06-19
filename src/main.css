@@ -15,12 +15,15 @@ html {
     font-family: 'Iosevka-Glitchcomet', monospace;
 }
 
+body {
+    overscroll-behavior-y: contain;
+}
+
 #fps {
     position: fixed;
     top: 0;
     right: 0;
     padding: min(20px, 2vmin);
-    background-color: black;
     font-size: min(12px, 2vmin);
     color: #9299b1;
 }
