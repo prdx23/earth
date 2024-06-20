@@ -4,10 +4,11 @@ import { Camera, OrbitCamera } from './engine/camera'
 import { keys, setupInputHandlers } from './engine/keys'
 import { Earth } from './objects/earth'
 import { Cube } from './objects/cube'
-import { Quaternion, Vec3 } from './math'
+import { Vec3 } from './math'
 import { Atmosphere } from './objects/atmosphere'
 import { Stars } from './objects/stars'
 import { loading } from './loading'
+import { Moon } from './objects/moon'
 
 
 
@@ -17,6 +18,7 @@ let canvas: HTMLCanvasElement
 
 const earth = new Earth()
 const atmosphere = new Atmosphere()
+const moon = new Moon()
 const cube = new Cube()
 const stars = new Stars()
 
@@ -48,6 +50,7 @@ async function render() {
     webgl.loading.progress += 2
     webgl.updateLoading()
 
+    await moon.load(gl)
     await atmosphere.load(gl)
     await cube.load(gl)
     await stars.load(gl)
@@ -62,7 +65,7 @@ async function render() {
     gl.enable(gl.DEPTH_TEST)
 
     const camera = new Camera(
-        20 * Math.PI / 180, 1, Earth.radius * 2, Earth.radius * 14,
+        20 * Math.PI / 180, 1, Earth.radius * 3, Earth.radius * 16,
     )
     // camera.target.set(0, -Earth.radius * 0.2, 0)
     // camera.position.set(0, 400, 1800)
@@ -70,14 +73,12 @@ async function render() {
 
     const orbitCam = new OrbitCamera()
     orbitCam.distance = Earth.radius * 10
-    orbitCam.angle = { x: -30, y: -30 }
+    orbitCam.angle = { x: -30, y: -24 }
     orbitCam.updateCamera(camera)
     let cameraUntouched = true
     let viewProjectionMatrix = camera.viewProjectionMatrix()
 
 
-    let earthRotationAngle = 0
-    const q = Quaternion.identity()
     const lightPosition = new Vec3(1000, 0, Earth.radius + 1000)
     const lightDirection = Vec3.zero().subtract(lightPosition)
 
@@ -146,16 +147,6 @@ async function render() {
         camera.updateProjectionMatrix()
         viewProjectionMatrix = camera.viewProjectionMatrix()
 
-        earthRotationAngle += (1.0 * elapsed / 1000) % 360
-        earth.matrix.identity()
-            .multiply(q.setAxisAngle(
-                Vec3.front, -23.5 * Math.PI / 180
-            ).matrix())
-            .multiply(q.setAxisAngle(
-                Vec3.up, earthRotationAngle * Math.PI / 180
-            ).matrix())
-
-
         // cube.matrix.identity()
         //     // .multiply(q.setAxisAngle(Vec3.up, ((frames * -0.05) % 360) * Math.PI / 180).matrix())
         //     .translate(1000, 0, Earth.radius + 1000)
@@ -163,11 +154,14 @@ async function render() {
         // lightPosition.setTranslationFromMatrix(cube.matrix)
         // lightDirection.set(0, 0, 0).subtract(lightPosition)
 
-
-        // cube.render(gl, frames, viewProjectionMatrix)
+        moon.render(
+            gl, elapsed,
+            viewProjectionMatrix, lightDirection, camera.position
+        )
 
         earth.render(
-            gl, viewProjectionMatrix, lightDirection, camera.position
+            gl, elapsed,
+            viewProjectionMatrix, lightDirection, camera.position
         )
 
         stars.render(gl, viewProjectionMatrix.inverse())

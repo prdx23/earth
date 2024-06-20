@@ -9,7 +9,7 @@ export function loadImage(path: string): Promise<HTMLImageElement> {
 
         image.src = path
         image.addEventListener('load', () => {
-            webgl.loading.progress += 3
+            webgl.loading.progress += 2
             webgl.updateLoading()
             resolve(image)
         })

@@ -40,11 +40,9 @@ void main() {
 
     // diffuse directional light
     float diffuse_intensity = 1.0;
-    float diffuse_light = diffuse_intensity * max(
-        0.0,
-        // stylized exponential dropoff
-        pow(dot(normal, -light_direction), gamma)
-        // dot(normal, -light_direction)
+    float diffuse_light = diffuse_intensity * pow(
+        max(0.0, dot(normal, -light_direction)),
+        gamma
     );
 
 
@@ -52,7 +50,7 @@ void main() {
     // specular highlights
     float specular_brightness = data.r;
     float shininess = 128.0;
-    float specular_intensity = 8.0;
+    float specular_intensity = 4.0;
     vec3 view_direction = normalize(u_camera_position - v_position.xyz);
     vec3 half_dir = normalize(-light_direction + view_direction);
     float specular_light = pow(max(0.0, dot(normal, half_dir)), shininess);
@@ -92,25 +90,15 @@ void main() {
     vec3 nightlights_texture = vec3(data.b);
     nightlights_texture *= nightlights_colortone * nightlights_intensity;
 
-    float nightlight_dropoff = clamp(
-        pow(dot(normal, light_direction), 3.0),
-        0.0, 1.0
-    );
-    vec3 nightlights = mix(
+    float nightlight_dropoff = pow(max(0.0, dot(normal, light_direction)), 3.0);
+    vec3 nightlights = nightlight_dropoff * mix(
         nightlights_texture,
         clouds * 0.003,
         is_clouds
-    ) * nightlight_dropoff;
+    );
 
-    float sun_facing = ceil(max(0.0, dot(normal, -light_direction)));
     vec4 output_color = vec4(0.0, 0.0, 1.0, 1.0);
-
     output_color.rgb = earth + nightlights;
-    // if (sun_facing == 1.0) {
-    //     output_color.rgb = earth;
-    // } else {
-    //     output_color.rgb = nightlights;
-    // }
 
     // output_color.rgb = vec3(0.0);
 

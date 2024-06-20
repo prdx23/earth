@@ -1,6 +1,6 @@
 
 import { webgl } from '../engine/webgl'
-import { Matrix4, Vec3 } from '../math'
+import { Matrix4, Quaternion, Vec3 } from '../math'
 import { generateSphere } from '../mesh/sphere'
 import { loadImage } from '../utils'
 
@@ -9,9 +9,13 @@ import vertex from '../shaders/earth.vert'
 import fragment from '../shaders/earth.frag'
 
 
+const q = Quaternion.identity()
+
+
 export class Earth {
 
     static radius = 1274.2 / 2.0
+    static tilt = 23.5
     static center = Vec3.zero()
     static scalingFactor = 10000.0
 
@@ -83,15 +87,28 @@ export class Earth {
         gl.uniform1i(this.uniforms.u_earth_texture, 0)
         gl.uniform1i(this.uniforms.u_data_texture, 1)
 
+
+        this.matrix.identity()
+            .multiply(Quaternion.axisAngle(
+                Vec3.front, -Earth.tilt * Math.PI / 180
+            ).matrix())
+
     }
 
 
     render(
         gl: WebGL2RenderingContext,
+        elapsed: number,
         viewProjectionMatrix: Matrix4,
         lightDirection: Vec3,
         cameraPosition: Vec3,
     ) {
+
+        q.setAxisAngle(
+            Vec3.up,
+            ((1.0 * elapsed / 1000) % 360) * Math.PI / 180
+        )
+        this.matrix.multiply(q.matrix())
 
         gl.useProgram(this.shader)
         gl.bindVertexArray(this.vao)

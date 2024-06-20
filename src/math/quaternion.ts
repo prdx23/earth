@@ -30,11 +30,12 @@ export class Quaternion {
         return new Quaternion(1, 0, 0, 0)
     }
 
-    identity() {
+    identity(): Quaternion {
         this.w = 1
         this.x = 0
         this.y = 0
         this.z = 0
+        return this
     }
 
 
