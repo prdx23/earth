@@ -13,8 +13,6 @@ import { loading } from './loading'
 
 let gl: WebGL2RenderingContext
 let canvas: HTMLCanvasElement
-const width =  2000
-const height = 2000
 
 
 const earth = new Earth()
@@ -26,7 +24,7 @@ const stars = new Stars()
 export async function init() {
 
 
-    const glctx = webgl.init(width, height)
+    const glctx = webgl.init(2000, 2000)
 
     if( !glctx ) {
         document.getElementById('loading-bar')!.innerText = 'error: webgl2 not available!'
@@ -64,9 +62,7 @@ async function render() {
     gl.enable(gl.DEPTH_TEST)
 
     const camera = new Camera(
-        20 * Math.PI / 180,
-        width / height,
-        Earth.radius * 2, Earth.radius * 14,
+        20 * Math.PI / 180, 1, Earth.radius * 2, Earth.radius * 14,
     )
     // camera.target.set(0, -Earth.radius * 0.2, 0)
     // camera.position.set(0, 400, 1800)
@@ -82,8 +78,8 @@ async function render() {
 
     let earthRotationAngle = 0
     const q = Quaternion.identity()
-    const lightPosition = Vec3.zero()
-    const lightDirection = Vec3.zero()
+    const lightPosition = new Vec3(1000, 0, Earth.radius + 1000)
+    const lightDirection = Vec3.zero().subtract(lightPosition)
 
     const fps = 60
     const fpsInterval = 1000 / fps
@@ -142,7 +138,7 @@ async function render() {
 
         if (cameraUntouched) {
             orbitCam.angle.x = (
-                orbitCam.angle.x - (0.1 * elapsed / 1000)
+                orbitCam.angle.x - (0.01 * elapsed / 1000)
             ) % 360
             orbitCam.updateCamera(camera)
         }
@@ -160,12 +156,12 @@ async function render() {
             ).matrix())
 
 
-        cube.matrix.identity()
-            // .multiply(q.setAxisAngle(Vec3.up, ((frames * -0.05) % 360) * Math.PI / 180).matrix())
-            .translate(1000, 0, Earth.radius + 1000)
-            .scale(100, 100, 100)
-        lightPosition.setTranslationFromMatrix(cube.matrix)
-        lightDirection.set(0, 0, 0).subtract(lightPosition)
+        // cube.matrix.identity()
+        //     // .multiply(q.setAxisAngle(Vec3.up, ((frames * -0.05) % 360) * Math.PI / 180).matrix())
+        //     .translate(1000, 0, Earth.radius + 1000)
+        //     .scale(100, 100, 100)
+        // lightPosition.setTranslationFromMatrix(cube.matrix)
+        // lightDirection.set(0, 0, 0).subtract(lightPosition)
 
 
         // cube.render(gl, frames, viewProjectionMatrix)
@@ -180,7 +176,7 @@ async function render() {
         atmosphere.render(
             gl, viewProjectionMatrix, lightDirection, camera.position
         )
-        gl.disable(gl.BLEND);
+        gl.disable(gl.BLEND)
 
     }
     loop(0)

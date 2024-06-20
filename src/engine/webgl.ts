@@ -16,7 +16,7 @@ export const webgl = {
         // canvas.style.height = `${1000}px`
 
         const gl = canvas.getContext('webgl2', {
-            antialias: true,
+            // antialias: true,
             alpha: false,
         })
         return gl
@@ -28,7 +28,7 @@ export const webgl = {
         const canvas = gl.canvas as HTMLCanvasElement
         const dwidth  = canvas.clientWidth
         const dheight = canvas.clientHeight
-        const res = 2000
+        const res = Math.max(dwidth, dheight) > 2400 ? 4000 : 2000
 
         let cwidth
         let cheight

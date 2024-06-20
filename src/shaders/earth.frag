@@ -93,7 +93,7 @@ void main() {
     nightlights_texture *= nightlights_colortone * nightlights_intensity;
 
     float nightlight_dropoff = clamp(
-        pow(dot(normal, light_direction), gamma),
+        pow(dot(normal, light_direction), 3.0),
         0.0, 1.0
     );
     vec3 nightlights = mix(
@@ -105,11 +105,12 @@ void main() {
     float sun_facing = ceil(max(0.0, dot(normal, -light_direction)));
     vec4 output_color = vec4(0.0, 0.0, 1.0, 1.0);
 
-    if (sun_facing == 1.0) {
-        output_color.rgb = earth;
-    } else {
-        output_color.rgb = nightlights;
-    }
+    output_color.rgb = earth + nightlights;
+    // if (sun_facing == 1.0) {
+    //     output_color.rgb = earth;
+    // } else {
+    //     output_color.rgb = nightlights;
+    // }
 
     // output_color.rgb = vec3(0.0);
 

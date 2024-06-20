@@ -30,35 +30,35 @@ export function generateIcosahedron() {
         new Triangle(v3, v6, v10),
 
         // front
+        new Triangle(v11, v3, v10),
         new Triangle(v4, v11, v10),
-        new Triangle(v3, v10, v11),
 
         // front down
-        new Triangle(v4, v8, v11),
-        new Triangle(v8, v7, v11),
+        new Triangle(v8, v11, v4),
+        new Triangle(v7, v11, v8),
         new Triangle(v3, v11, v7),
 
         // right
-        new Triangle(v3, v7, v2),
+        new Triangle(v2, v3, v7),
         new Triangle(v6, v3, v2),
 
         // back top
-        new Triangle(v6, v2, v9),
+        new Triangle(v9, v6, v2),
         new Triangle(v5, v6, v9),
         new Triangle(v1, v5, v9),
 
-        // back
-        new Triangle(v2, v12, v9),
-        new Triangle(v9, v12, v1),
+        // left
+        new Triangle(v4, v5, v1),
+        new Triangle(v8, v4, v1),
 
         // back down
-        new Triangle(v12, v2, v7),
-        new Triangle(v12, v7, v8),
         new Triangle(v12, v8, v1),
+        new Triangle(v7, v8, v12),
+        new Triangle(v2, v7, v12),
 
-        // left
-        new Triangle(v1, v8, v4),
-        new Triangle(v5, v1, v4),
+        // back
+        new Triangle(v9, v2, v12),
+        new Triangle(v1, v9, v12),
 
     ]
 
