@@ -60,6 +60,9 @@ async function render() {
     webgl.loading.status = false
     document.getElementById('loading')!.style.display = 'none'
     document.getElementById('content')!.style.display = 'block'
+    setTimeout(() => {
+        document.getElementById('controls')!.classList.add('fade-out')
+    }, 5000)
 
     gl.enable(gl.CULL_FACE)
     gl.enable(gl.DEPTH_TEST)

@@ -54,3 +54,18 @@ body {
     text-decoration: none;
     cursor: default;
 }
+
+#controls {
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: min(30px, 5vmin);
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* TEMP */
+}
+
+.fade-out {
+    transition: opacity 3s ease-out;
+    opacity: 0;
+}
