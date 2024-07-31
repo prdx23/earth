@@ -93,17 +93,17 @@ export function setupInputHandlers() {
     })
 
     window.addEventListener('touchstart', (event) => {
-        event.preventDefault()
+        // event.preventDefault()
         handleMouseDown(event.touches[0].pageX, event.touches[0].pageY)
     })
 
     window.addEventListener('touchmove', (event) => {
-        event.preventDefault()
+        // event.preventDefault()
         handleMouseMove(event.touches[0].pageX, event.touches[0].pageY)
     })
 
     window.addEventListener('touchend', (event) => {
-        event.preventDefault()
+        // event.preventDefault()
         handleMouseUp()
     })
 
