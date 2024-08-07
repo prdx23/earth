@@ -2,7 +2,7 @@
 # 🌍 Earth
 
 
-Realtime render of the earth built with pure WebGL and Typescript.
+Realtime render of the earth built with pure WebGL and Typescript.  
 Check it out live: [earth.glitchcomet.com](https://earth.glitchcomet.com)
 
 
@@ -12,6 +12,7 @@ It has the following features:
 - Sphere mesh created by recursively subdividing a handmade icosahedron
 - Specular highlights masked to oceans, rivers and ice
 - Separate day and night textures
+- Basic particle system to render procedural stars
 - Orbit camera with auto-adjusting FOV for viewport size
 - Implementations of Vec3, Matrix4 and Quaternion
 - HDR tone mapping and gamma correction

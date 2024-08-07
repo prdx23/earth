@@ -28,7 +28,7 @@ export const webgl = {
         const canvas = gl.canvas as HTMLCanvasElement
         const dwidth  = canvas.clientWidth
         const dheight = canvas.clientHeight
-        const res = Math.max(dwidth, dheight) > 2400 ? 4000 : 2000
+        const res = Math.max(dwidth, dheight) > 2400 ? 4096 : 2048
 
         let cwidth
         let cheight

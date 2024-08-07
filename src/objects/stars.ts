@@ -4,6 +4,7 @@ import { Matrix4 } from '../math'
 
 import vertex from '../shaders/stars.vert'
 import fragment from '../shaders/stars.frag'
+import { generateStars } from '../tools/generateStars'
 
 export class Stars {
 
@@ -27,56 +28,48 @@ export class Stars {
         this.vao = gl.createVertexArray()
         gl.bindVertexArray(this.vao)
 
-        const vertices = new Float32Array([
-          -1, -1,
-           1, -1,
-          -1,  1,
+        const NPARTICLES = 28000
+        this.vertexCount = NPARTICLES
 
-          -1,  1,
-           1, -1,
-           1,  1,
-        ])
+        const starsData = generateStars(NPARTICLES)
 
         webgl.loadAttribute(
             gl, 'a_position', this.shader,
-            vertices, 2, gl.FLOAT, false
+            starsData.vertices, 3, gl.FLOAT, false
         )
 
+        webgl.loadAttribute(
+            gl, 'a_color', this.shader,
+            starsData.colors, 3, gl.UNSIGNED_BYTE, true
+        )
 
-        // gl.activeTexture(gl.TEXTURE4)
-        // const texture = await webgl.loadTexture(
-        //     gl, 'src/textures/stars_colors.png'
-        // )
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+        webgl.loadAttribute(
+            gl, 'a_size', this.shader,
+            starsData.sizes, 1, gl.FLOAT, false
+        )
 
         const uniforms = [
-            'u_inv_view_projection_matrix', 'u_stars_colors'
+            'u_view_projection_matrix',
         ]
         for (const uniform of uniforms) {
             this.uniforms[uniform] = gl.getUniformLocation(this.shader, uniform)!
         }
 
-        // gl.useProgram(this.shader)
-        // gl.bindVertexArray(this.vao)
-        // gl.uniform1i(this.uniforms.u_stars_texture, 4)
-
     }
 
 
-    render(gl: WebGL2RenderingContext, invViewProjectionMatrix: Matrix4) {
+    render(gl: WebGL2RenderingContext, viewProjectionMatrix: Matrix4) {
 
         gl.useProgram(this.shader)
         gl.bindVertexArray(this.vao)
 
         gl.uniformMatrix4fv(
-            this.uniforms['u_inv_view_projection_matrix'],
+            this.uniforms['u_view_projection_matrix'],
             false,
-            invViewProjectionMatrix.matrix
+            viewProjectionMatrix.matrix
         )
 
-        gl.drawArrays(gl.TRIANGLES, 0, this.vertexCount)
+        gl.drawArrays(gl.POINTS, 0, this.vertexCount)
     }
 
 }

@@ -68,7 +68,7 @@ async function render() {
     gl.enable(gl.DEPTH_TEST)
 
     const camera = new Camera(
-        20 * Math.PI / 180, 1, Earth.radius * 3, Earth.radius * 16,
+        20 * Math.PI / 180, 1, Earth.radius * 3, Earth.radius * 28,
     )
     // camera.target.set(0, -Earth.radius * 0.2, 0)
     // camera.position.set(0, 400, 1800)
@@ -112,13 +112,13 @@ async function render() {
 
 
         gl.clearColor(0, 0, 0, 1)
-        gl.blendFunc(gl.ONE, gl.ONE)
+        // gl.blendFunc(gl.ONE, gl.ONE)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-        if (keys.any) {
-            cameraUntouched = false
-        }
+        // if (keys.any) {
+        //     cameraUntouched = false
+        // }
 
         if (cameraUntouched) {
             orbitCam.angle.x = (
@@ -157,6 +157,8 @@ async function render() {
         // lightPosition.setTranslationFromMatrix(cube.matrix)
         // lightDirection.set(0, 0, 0).subtract(lightPosition)
 
+
+
         moon.render(
             gl, elapsed,
             viewProjectionMatrix, lightDirection, camera.position
@@ -167,12 +169,16 @@ async function render() {
             viewProjectionMatrix, lightDirection, camera.position
         )
 
-        stars.render(gl, viewProjectionMatrix.inverse())
-
         gl.enable(gl.BLEND)
+
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        stars.render(gl, viewProjectionMatrix)
+
+        gl.blendFunc(gl.ONE, gl.ONE)
         atmosphere.render(
             gl, viewProjectionMatrix, lightDirection, camera.position
         )
+
         gl.disable(gl.BLEND)
 
     }

@@ -1,5 +1,5 @@
-import { webgl } from "./engine/webgl"
 
+import { webgl } from "./engine/webgl"
 
 
 export function loadImage(path: string): Promise<HTMLImageElement> {
@@ -20,4 +20,13 @@ export function loadImage(path: string): Promise<HTMLImageElement> {
         })
 
     })
+}
+
+
+export function rng(a: number, b: number): number {
+    return Math.floor(Math.random() * (Math.floor(b) - Math.ceil(a) + 1) + Math.ceil(a))
+}
+
+export function choice<T>(array: Array<T>): T {
+    return array[rng(0, array.length - 1)]
 }
