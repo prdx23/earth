@@ -2,6 +2,10 @@
 import { webgl } from "./engine/webgl"
 
 
+declare const DEV_CDN_URL: string
+declare const PROD_CDN_URL: string
+
+
 export function loadImage(path: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
 

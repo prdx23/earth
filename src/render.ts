@@ -1,7 +1,7 @@
 
 import { webgl } from './engine/webgl'
 import { Camera, OrbitCamera } from './engine/camera'
-import { keys, setupInputHandlers } from './engine/keys'
+import { setupInputHandlers } from './engine/keys'
 import { Earth } from './objects/earth'
 import { Cube } from './objects/cube'
 import { Vec3 } from './math'
@@ -78,7 +78,7 @@ async function render() {
     orbitCam.distance = Earth.radius * 10
     orbitCam.angle = { x: -30, y: -24 }
     orbitCam.updateCamera(camera)
-    let cameraUntouched = true
+    const cameraUntouched = true
     let viewProjectionMatrix = camera.viewProjectionMatrix()
 
 

@@ -102,7 +102,7 @@ export function setupInputHandlers() {
         handleMouseMove(event.touches[0].pageX, event.touches[0].pageY)
     })
 
-    window.addEventListener('touchend', (event) => {
+    window.addEventListener('touchend', () => {
         // event.preventDefault()
         handleMouseUp()
     })

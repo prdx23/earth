@@ -1,4 +1,3 @@
-import { loadImage } from "../utils"
 
 
 type Gl = WebGL2RenderingContext

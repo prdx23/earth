@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+    <head>
+        <meta charset='UTF-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+
+        <title> Earth | Glitchcomet </title>
+
+        <style>
+
+            *, *:before, *:after {
+                box-sizing: border-box;
+            }
+
+            html{
+                margin: 0;
+                padding: 0;
+                background-color: black;
+                color: white;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            #webgl-canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: -2;
+                width: 100%;
+                height: 100%;
+            }
+
+            #webgl-canvas canvas {
+                width: 100%;
+                height: 100%;
+            }
+
+            #loading {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: -1;
+                width: 100%;
+                height: 100%;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+
+                font-size: 2.0vmin;
+                font-family: monospace;
+                color: #dedefe;
+                text-align: center;
+            }
+
+            #loading pre {
+                margin: 0;
+                padding: 0;
+            }
+
+        </style>
+
+      <script type="module" crossorigin src="/assets/index-CfOGZTHU.js"></script>
+      <link rel="stylesheet" crossorigin href="/assets/index-BaO44F2z.css">
+    </head>
+
+    <body>
+        <main>
+
+            <section id='webgl-canvas'> </section>
+
+            <section id='loading'>
+                loading
+                <pre id='loading-bar'>[■■--------]</pre>
+            </section>
+
+            <section id='fps'></section>
+
+            <article id='content' style='display: none'>
+                <h1>earth</h1>
+
+                <nav>
+                    <button class='reset-btn' id='controls-btn'>controls</button>
+                    <button class='reset-btn' id='about-btn'>about</button>
+                </nav>
+
+                <section id='controls'>
+                    <h3>controls</h3>
+                    <ul>
+                        <li>move: wasd, arrow keys or click/touch and drag</li>
+                        <li>zoom: +/- keys or mouse scroll</li>
+                    </ul>
+                </section>
+
+
+            </article>
+
+            <section id='about' style='display: none'>
+
+                <br>
+                <br>
+
+                <button class='reset-btn' id='close-about-btn'>
+                    ← <span style='text-decoration: underline'>back</span>
+                </button>
+                <br>
+                <br>
+
+                <h1> 🌍 Earth </h1>
+                <br>
+
+                <p>
+                    Realtime render of the earth built with pure WebGL and Typescript.
+                </p>
+
+                <p>
+                    It has the following features:
+                    <br>
+
+                    <ul>
+                        <li>Atmospheric rayleigh scattering</li>
+                        <li>Blinn phong lighting</li>
+                        <li>Sphere mesh created by recursively subdividing a handmade icosahedron</li>
+                        <li>Specular highlights masked to oceans, rivers and ice</li>
+                        <li>Separate day and night textures</li>
+                        <li>Basic particle system to render procedural stars</li>
+                        <li>Orbit camera with auto-adjusting FOV for viewport size</li>
+                        <li>Implementations of Vec3, Matrix4 and Quaternion</li>
+                        <li>HDR tone mapping and gamma correction</li>
+                    </ul>
+                    <br>
+
+                    <span style='font-weight: bold'>github:</span>
+                    <a href='https://github.com/prdx23/earth/'>prdx23/earth</a>
+                </p>
+
+                <br>
+
+                <h3>Controls </h3>
+                <p>
+                    <ul>
+                        <li>move: wasd, arrow keys or click/touch and drag</li>
+                        <li>zoom: +/- keys or mouse scroll</li>
+                    </ul>
+                </p>
+
+                <br>
+
+                <h3> Attribution </h3>
+                <ul>
+                    <li><a href='https://visibleearth.nasa.gov/collection/1484/blue-marble'>NASA's Visible Earth collections</a></li>
+                    <li><a href='https://www.solarsystemscope.com/textures/'>Solar System Scope</a></li>
+                </ul>
+
+                <br>
+                <br>
+                <br>
+
+                <a href='https://glitchcomet.com'>glitchcomet.com →</a>
+
+                <br>
+                <br>
+
+            </section>
+
+        </main>
+    </body>
+
+</html>
