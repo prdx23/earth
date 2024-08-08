@@ -12,6 +12,7 @@ export function loadImage(path: string): Promise<HTMLImageElement> {
         const image = new Image()
         const baseURL = import.meta.env.PROD ? PROD_CDN_URL : DEV_CDN_URL
 
+        image.crossOrigin = ''
         image.src = baseURL + path
         image.addEventListener('load', () => {
             webgl.loading.progress += 2
