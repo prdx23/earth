@@ -15,7 +15,13 @@ export default defineConfig(({ command, mode }) => {
             'DEV_CDN_URL': JSON.stringify(env.VITE_DEV_CDN_URL),
             'PROD_CDN_URL': JSON.stringify(env.VITE_PROD_CDN_URL),
         },
-
+        build: {
+            rollupOptions: {
+                output: {
+                    assetFileNames: `assets/[name].[ext]`,
+                }
+            }
+        }
     }
 })
 
