@@ -19,7 +19,7 @@ export class Moon {
     static radius = Earth.radius * 0.2727
     static inclination = 5.145
     static tilt = 6.68
-    static distance = Earth.radius * 6
+    static distance = 38440 / 10
 
     vao: WebGLVertexArrayObject | null
     vertexCount: number
@@ -56,12 +56,12 @@ export class Moon {
 
 
         gl.activeTexture(gl.TEXTURE4)
-        const image4 = await loadImage('src/textures/optimized/moon_2k.png')
+        const image4 = await loadImage('moon_2k.png')
         const texture4 = gl.createTexture()
         gl.bindTexture(gl.TEXTURE_2D, texture4)
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image4)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
 

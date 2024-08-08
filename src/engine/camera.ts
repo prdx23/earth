@@ -65,7 +65,7 @@ export class Camera {
 
 export class OrbitCamera {
 
-    static angleSpeed = 1
+    static angleSpeed = 0.5
     static dragSpeed = 0.1
     static yLimitLower = -89
     static yLimitUpper = 89
